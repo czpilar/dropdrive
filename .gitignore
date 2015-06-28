@@ -1,0 +1,13 @@
+/dropdrive.iml
+/.idea
+/.svn
+/target
+/dropdrive-cmd/dropdrive.properties
+/dropdrive-cmd/target
+/dropdrive-core/target
+/dropdrive-cmd/dropdrive-cmd.iml
+/dropdrive-core/dropdrive-core.iml
+/dropdrive-parent.iml
+/dropdrive-cmd/test1.txt
+/dropdrive-cmd/test2.txt
+/dropdrive-cmd/test3.txt

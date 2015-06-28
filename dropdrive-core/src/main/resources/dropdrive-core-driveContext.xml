@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+
+    <bean id="dropdrive-core-dbxAppInfo" class="com.dropbox.core.DbxAppInfo">
+        <constructor-arg name="key" value="#{dropDriveCoreDropDriveSetting.clientKey}" />
+        <constructor-arg name="secret" value="#{dropDriveCoreDropDriveSetting.clientSecret}" />
+    </bean>
+
+    <bean id="dropdrive-core-userLocale" class="java.util.Locale" factory-method="getDefault" />
+
+    <bean id="dropdrive-core-dbxRequestConfig" class="com.dropbox.core.DbxRequestConfig">
+        <constructor-arg name="clientIdentifier" value="#{dropDriveCoreDropDriveSetting.applicationName}" />
+        <constructor-arg name="userLocale">
+            <bean factory-bean="dropdrive-core-userLocale" factory-method="toString" />
+        </constructor-arg>
+    </bean>
+
+    <bean id="dropdrive-core-dbxClient" class="com.dropbox.core.DbxClient" scope="prototype">
+        <constructor-arg name="requestConfig" ref="dropdrive-core-dbxRequestConfig" />
+        <constructor-arg name="accessToken" value="#{dropDriveCoreCredentialLoader.credential.accessToken}" />
+    </bean>
+
+    <bean id="dropdrive-core-dbxWebAuthNoRedirect" class="com.dropbox.core.DbxWebAuthNoRedirect">
+        <constructor-arg name="requestConfig" ref="dropdrive-core-dbxRequestConfig" />
+        <constructor-arg name="appInfo" ref="dropdrive-core-dbxAppInfo" />
+    </bean>
+
+</beans>
