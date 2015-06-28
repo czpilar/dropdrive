@@ -4,7 +4,7 @@
     <groupId>net.czpilar.dropdrive</groupId>
     <artifactId>dropdrive-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>dropdrive-parent</name>
     <description>Simple java application for uploading file(s) to Dropbox.</description>
 
@@ -37,7 +37,7 @@
         <connection>scm:git:git@github.com:czpilar/dropdrive.git</connection>
         <developerConnection>scm:git:git@github.com:czpilar/dropdrive.git</developerConnection>
         <url>https://github.com/czpilar/dropdrive</url>
-        <tag>HEAD</tag>
+        <tag>dropdrive-parent-1.0.1</tag>
     </scm>
 
     <properties>
