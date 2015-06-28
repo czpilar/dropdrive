@@ -19,8 +19,8 @@
             <directory>${project.basedir}/target/classes</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>dropbdrive.bat</include>
-                <include>dropbdrive.sh</include>
+                <include>dropdrive.bat</include>
+                <include>dropdrive.sh</include>
             </includes>
         </fileSet>
     </fileSets>
