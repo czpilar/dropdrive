@@ -23,7 +23,10 @@ public abstract class AbstractFileService extends AbstractService {
         if (parent != null) {
             path.append(parent.path);
         }
-        path.append("/").append(filename);
+        if (!filename.startsWith("/")) {
+            path.append("/");
+        }
+        path.append(filename);
 
         return path.toString();
     }

@@ -1,14 +1,16 @@
 package net.czpilar.dropdrive.core.service.impl;
 
-import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.dropbox.core.DbxEntry;
-import com.dropbox.core.DbxWriteMode;
+import com.dropbox.core.DbxException;
 import net.czpilar.dropdrive.core.exception.FileHandleException;
+import net.czpilar.dropdrive.core.listener.impl.FileUploadProgressListener;
+import net.czpilar.dropdrive.core.request.IFileRequest;
+import net.czpilar.dropdrive.core.request.impl.FileRequest;
 import net.czpilar.dropdrive.core.service.IDirectoryService;
 import net.czpilar.dropdrive.core.service.IFileService;
 import org.slf4j.Logger;
@@ -61,21 +63,25 @@ public class FileService extends AbstractFileService implements IFileService {
     private DbxEntry.File insertFile(Path pathToFile, DbxEntry.Folder parentDir) throws Exception {
         String filename = pathToFile.getFileName().toString();
         LOG.info("Uploading new file {}", filename);
-        return execute(getPath(filename, parentDir), DbxWriteMode.add(), pathToFile.toFile().length(), new FileInputStream(pathToFile.toFile()));
+        FileRequest.Insert request = new FileRequest.Insert(getDbxClient(), getPath(filename, parentDir), pathToFile.toFile());
+        request.setProgressListener(new FileUploadProgressListener(filename, pathToFile.toFile().length()));
+        return execute(request);
     }
 
     private DbxEntry.File updateFile(DbxEntry.File currentFile, Path pathToFile) throws Exception {
         String filename = pathToFile.getFileName().toString();
         LOG.info("Uploading updated file {}", filename);
-        return execute(currentFile.path, DbxWriteMode.update(currentFile.rev), pathToFile.toFile().length(), new FileInputStream(pathToFile.toFile()));
+        FileRequest.Update request = new FileRequest.Update(getDbxClient(), currentFile, pathToFile.toFile());
+        request.setProgressListener(new FileUploadProgressListener(filename, pathToFile.toFile().length()));
+        return execute(request);
     }
 
-    private DbxEntry.File execute(String filename, DbxWriteMode mode, long length, FileInputStream stream) throws Exception {
+    private DbxEntry.File execute(IFileRequest request) throws Exception {
         int retry = 0;
         while (true) {
             try {
-                return getDbxClient().uploadFile(filename, mode, length, stream);
-            } catch (Exception e) {
+                return request.execute();
+            } catch (DbxException e) {
                 retry++;
                 if (retry > getRetries()) {
                     throw e;
