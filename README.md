@@ -1,8 +1,8 @@
 dropDrive
 =========
 
-- `dropdrive-cmd` is simple java command line application for uploading file(s) to Google Drive.
-- `dropdrive-core` is core library which provide ability for uploading file(s) to Google Drive.
+- `dropdrive-cmd` is simple java command line application for uploading file(s) to Dropbox.
+- `dropdrive-core` is core library which provide ability for uploading file(s) to Dropbox.
 
 dropDrive as command line application
 -------------------------------------
@@ -26,7 +26,7 @@ usage: `dropdrive [-a <code>] [-d <dir>] [-f <file>] [-h] [-l] [-p <props>] [-v]
    `dropdrive -p dropdrive.properties -a <code>`
 
 ### How to upload files
-Upload file(s) to google drive:<br/>
+Upload file(s) to Dropbox:<br/>
    `dropdrive -p dropdrive.properties -f <file1> <file2> <file3>`
 
 Files are uploaded to `dropdrive-uploads` directory by default.
@@ -38,12 +38,12 @@ If you want to change upload directory:
    `dropdrive -p dropdrive.properties -f <file> -d <path>/<to>/<dir>`
 
 ### How to use properties file
-- `dropdrive.accessToken` - Google Drive access token; this property is updated automatically by dropDrive
+- `dropdrive.accessToken` - Dropbox access token; this property is updated automatically by dropDrive
 - `dropdrive.uploadDir` - path to dir where files will be uploaded: `<path>/<to>/<dir>`
 
 dropDrive as core library
 -------------------------
-dropDrive core can be used in any other application to provide ability for uploading file(s) to Google Drive.
+dropDrive core can be used in any other application to provide ability for uploading file(s) to Dropbox.
 
 ### Usage
 1. add implementation of `IDropDriveCredential` interface to spring context
