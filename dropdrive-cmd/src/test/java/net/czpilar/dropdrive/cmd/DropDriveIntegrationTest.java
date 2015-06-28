@@ -40,7 +40,7 @@ public class DropDriveIntegrationTest {
 
     @Test
     public void testAuthorize() {
-        DropDrive.main(new String[] { "-a", "6Vw_ImSRc-sAAAAAAAIJvlAxVYMDOVJfhJ0qG0bwhhI", "-p", PROPERTIES });
+        DropDrive.main(new String[] { "-a", "6Vw_ImSRc-sAAAAAAAIJwTp0MZOnmm03FclgR6ZWSVU", "-p", PROPERTIES });
     }
 
     private void createFileIfNotExist(String filename) throws IOException {
