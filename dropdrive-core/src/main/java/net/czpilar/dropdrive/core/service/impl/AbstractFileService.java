@@ -42,14 +42,14 @@ public abstract class AbstractFileService extends AbstractService {
     }
 
     private DbxEntry findEntry(String filename, DbxEntry.Folder parent) {
-        DbxEntry file;
+        DbxEntry entry;
         try {
-            file = getDbxClient().getMetadata(getPath(filename, parent));
+            entry = getDbxClient().getMetadata(getPath(filename, parent));
         } catch (DbxException e) {
             LOG.error("Unable to find {}.", filename);
             throw new FileHandleException("Unable to find file.", e);
         }
-        return file;
+        return entry;
     }
 
 }

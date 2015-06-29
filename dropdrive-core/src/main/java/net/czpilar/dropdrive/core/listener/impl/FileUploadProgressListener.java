@@ -30,11 +30,15 @@ public class FileUploadProgressListener implements IFileUploadProgressListener {
                 LOG.info("Initiation uploading file {}", filename);
                 break;
             case IN_PROGRESS:
-                LOG.info("Uploaded {} of file {}", NumberFormat.getPercentInstance().format((double) uploaded / length), filename);
+                LOG.info("Uploaded {} of file {}", NumberFormat.getPercentInstance().format(getProgress(uploaded)), filename);
                 break;
             case COMPLETE:
                 LOG.info("Finished uploading file {}", filename);
                 break;
         }
+    }
+
+    private double getProgress(long uploaded) {
+        return length == 0 ? 0 : ((double) uploaded / length);
     }
 }

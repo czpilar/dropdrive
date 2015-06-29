@@ -23,7 +23,7 @@ public class EqualUtils {
         boolean result = false;
         if (file != null && pathToFile != null) {
             File localFile = pathToFile.toFile();
-            result = file.numBytes == localFile.length() && file.lastModified.getTime() >= localFile.lastModified();
+            result = localFile.exists() && file.numBytes == localFile.length() && file.lastModified.getTime() >= localFile.lastModified();
         }
         return result;
     }
