@@ -13,6 +13,7 @@ import net.czpilar.dropdrive.core.request.IFileRequest;
 import net.czpilar.dropdrive.core.request.impl.FileRequest;
 import net.czpilar.dropdrive.core.service.IDirectoryService;
 import net.czpilar.dropdrive.core.service.IFileService;
+import net.czpilar.dropdrive.core.util.EqualUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,9 +100,12 @@ public class FileService extends AbstractFileService implements IFileService {
 
             if (currentFile == null) {
                 currentFile = insertFile(pathToFile, parentDir);
-            } else {
+            } else if (EqualUtils.notEquals(currentFile, pathToFile)) {
                 currentFile = updateFile(currentFile, pathToFile);
+            } else {
+                LOG.info("There is nothing to upload.");
             }
+
             LOG.info("Finished uploading file {} - remote revision is {}", filename, currentFile.rev);
             return currentFile;
         } catch (Exception e) {
