@@ -9,7 +9,7 @@ import net.czpilar.dropdrive.cmd.exception.CommandLineException;
 import net.czpilar.dropdrive.cmd.runner.IDropDriveCmdRunner;
 import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.service.IAuthorizationService;
-import net.czpilar.dropdrive.core.service.impl.FileService;
+import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -41,9 +41,7 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
 
     private IAuthorizationService authorizationService;
 
-    @Autowired
-    private FileService fileService;
-//    private IFileService fileService;
+    private IFileService fileService;
 
     private DropDriveSetting dropDriveSetting;
 
@@ -69,10 +67,10 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
         this.authorizationService = authorizationService;
     }
 
-//    @Autowired
-//    public void setFileService(IFileService fileService) {
-//        this.fileService = fileService;
-//    }
+    @Autowired
+    public void setFileService(IFileService fileService) {
+        this.fileService = fileService;
+    }
 
     @Autowired
     public void setDropDriveSetting(DropDriveSetting dropDriveSetting) {
