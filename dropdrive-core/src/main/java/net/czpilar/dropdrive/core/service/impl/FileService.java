@@ -9,8 +9,7 @@ import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import net.czpilar.dropdrive.core.exception.FileHandleException;
 import net.czpilar.dropdrive.core.listener.impl.FileUploadProgressListener;
-import net.czpilar.dropdrive.core.request.IFileRequest;
-import net.czpilar.dropdrive.core.request.impl.FileRequest;
+import net.czpilar.dropdrive.core.request.FileRequest;
 import net.czpilar.dropdrive.core.service.IDirectoryService;
 import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.util.EqualUtils;
@@ -64,7 +63,7 @@ public class FileService extends AbstractFileService implements IFileService {
     private DbxEntry.File insertFile(Path pathToFile, DbxEntry.Folder parentDir) throws Exception {
         String filename = pathToFile.getFileName().toString();
         LOG.info("Uploading new file {}", filename);
-        FileRequest.Insert request = new FileRequest.Insert(getDbxClient(), getPath(filename, parentDir), pathToFile.toFile());
+        FileRequest request = FileRequest.createInsert(getDbxClient(), getPath(filename, parentDir), pathToFile.toFile());
         request.setProgressListener(new FileUploadProgressListener(filename, pathToFile.toFile().length()));
         return execute(request);
     }
@@ -72,12 +71,12 @@ public class FileService extends AbstractFileService implements IFileService {
     private DbxEntry.File updateFile(DbxEntry.File currentFile, Path pathToFile) throws Exception {
         String filename = pathToFile.getFileName().toString();
         LOG.info("Uploading updated file {}", filename);
-        FileRequest.Update request = new FileRequest.Update(getDbxClient(), currentFile, pathToFile.toFile());
+        FileRequest request = FileRequest.createUpdate(getDbxClient(), currentFile, pathToFile.toFile());
         request.setProgressListener(new FileUploadProgressListener(filename, pathToFile.toFile().length()));
         return execute(request);
     }
 
-    private DbxEntry.File execute(IFileRequest request) throws Exception {
+    private DbxEntry.File execute(FileRequest request) throws Exception {
         int retry = 0;
         while (true) {
             try {

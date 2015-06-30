@@ -1,4 +1,4 @@
-package net.czpilar.dropdrive.core.request.impl;
+package net.czpilar.dropdrive.core.request;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,32 +9,27 @@ import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxWriteMode;
 import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
-import net.czpilar.dropdrive.core.request.IFileRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Template class implementing file request using chunk file upload.
+ * File request implementation for uploading file using chunk file upload.
  *
  * @author David Pilar (david@czpilar.net)
  */
-public abstract class FileRequest implements IFileRequest {
+public class FileRequest {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileRequest.class);
 
     public static final int CHUNK_SIZE = 4194304; // 4MB
     public static final int CHUNK_RETRIES = 3;
 
-    public static class Insert extends FileRequest {
-        public Insert(DbxClient dbxClient, String remoteFilePath, File localFile) {
-            super(dbxClient, remoteFilePath, localFile, DbxWriteMode.add());
-        }
+    public static FileRequest createInsert(DbxClient dbxClient, String remoteFilePath, File localFile) {
+        return new FileRequest(dbxClient, remoteFilePath, localFile, DbxWriteMode.add());
     }
 
-    public static class Update extends FileRequest {
-        public Update(DbxClient dbxClient, DbxEntry.File remoteFile, File localFile) {
-            super(dbxClient, remoteFile.path, localFile, DbxWriteMode.update(remoteFile.rev));
-        }
+    public static FileRequest createUpdate(DbxClient dbxClient, DbxEntry.File remoteFile, File localFile) {
+        return new FileRequest(dbxClient, remoteFile.path, localFile, DbxWriteMode.update(remoteFile.rev));
     }
 
     private final DbxClient dbxClient;
@@ -44,7 +39,7 @@ public abstract class FileRequest implements IFileRequest {
 
     private IFileUploadProgressListener progressListener;
 
-    public FileRequest(DbxClient dbxClient, String remoteFilePath, File localFile, DbxWriteMode dbxWriteMode) {
+    private FileRequest(DbxClient dbxClient, String remoteFilePath, File localFile, DbxWriteMode dbxWriteMode) {
         this.dbxClient = dbxClient;
         this.remoteFilePath = remoteFilePath;
         this.localFile = localFile;
@@ -55,7 +50,6 @@ public abstract class FileRequest implements IFileRequest {
         this.progressListener = progressListener;
     }
 
-    @Override
     public DbxEntry.File execute() throws IOException, DbxException {
         int offsetBytes = 0;
 
