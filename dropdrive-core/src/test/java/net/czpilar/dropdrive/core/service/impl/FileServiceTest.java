@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.DbxUserFilesRequests;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
+import com.dropbox.core.v2.files.Metadata;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import net.czpilar.dropdrive.core.exception.FileHandleException;
 import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
@@ -35,7 +38,7 @@ import static org.mockito.Mockito.*;
  * @author David Pilar (david@czpilar.net)
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DbxClient.class, DbxEntry.File.class, DbxEntry.Folder.class, EqualUtils.class, FileRequest.class })
+@PrepareForTest({ DbxClientV2.class, DbxUserFilesRequests.class, EqualUtils.class, FileRequest.class })
 public class FileServiceTest {
 
     private FileService service = new FileService(3);
@@ -50,7 +53,7 @@ public class FileServiceTest {
     private ApplicationContext applicationContext;
 
     @Mock
-    private DbxClient dbxClient;
+    private DbxClientV2 dbxClient;
 
     @Mock
     private IDropDriveCredential dropDriveCredential;
@@ -63,7 +66,7 @@ public class FileServiceTest {
         service.setDirectoryService(directoryService);
 
         when(serviceMock.getDirectoryService()).thenReturn(directoryService);
-        when(applicationContext.getBean(DbxClient.class)).thenReturn(dbxClient);
+        when(applicationContext.getBean(DbxClientV2.class)).thenReturn(dbxClient);
 
         PowerMockito.mockStatic(EqualUtils.class);
         PowerMockito.mockStatic(FileRequest.class);
@@ -108,18 +111,18 @@ public class FileServiceTest {
     @Test
     public void testUploadFileWithStringFilenameAndNullParent() throws IOException, DbxException {
         String filename = "test-filename";
-        DbxEntry.Folder parentDir = null;
-        DbxEntry.File file = mock(DbxEntry.File.class);
+        FolderMetadata parentDir = null;
+        FileMetadata file = mock(FileMetadata.class);
         FileRequest insert = mock(FileRequest.class);
 
-        when(serviceMock.getPath(anyString(), any(DbxEntry.class))).thenReturn(filename);
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any(Metadata.class))).thenReturn(filename);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(null);
-        when(FileRequest.createInsert(any(DbxClient.class), anyString(), any(File.class))).thenReturn(insert);
+        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(null);
+        when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
         when(insert.execute()).thenReturn(file);
 
-        DbxEntry.File result = serviceMock.uploadFile(filename, parentDir);
+        FileMetadata result = serviceMock.uploadFile(filename, parentDir);
 
         assertNotNull(result);
         assertEquals(file, result);
@@ -130,6 +133,7 @@ public class FileServiceTest {
         verify(serviceMock).findFile(filename, parentDir);
         verify(insert).execute();
         verify(insert).setProgressListener(any(IFileUploadProgressListener.class));
+        verify(file).getRev();
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(dbxClient);
@@ -140,18 +144,18 @@ public class FileServiceTest {
     @Test
     public void testUploadFileWithStringFilenameAndFileParent() throws IOException, DbxException {
         String filename = "test-filename";
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.File file = mock(DbxEntry.File.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FileMetadata file = mock(FileMetadata.class);
         FileRequest insert = mock(FileRequest.class);
 
-        when(serviceMock.getPath(anyString(), any(DbxEntry.class))).thenReturn(filename);
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any(Metadata.class))).thenReturn(filename);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(null);
-        when(FileRequest.createInsert(any(DbxClient.class), anyString(), any(File.class))).thenReturn(insert);
+        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(null);
+        when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
         when(insert.execute()).thenReturn(file);
 
-        DbxEntry.File result = serviceMock.uploadFile(filename, parentDir);
+        FileMetadata result = serviceMock.uploadFile(filename, parentDir);
 
         assertNotNull(result);
         assertEquals(file, result);
@@ -162,6 +166,7 @@ public class FileServiceTest {
         verify(serviceMock).findFile(filename, parentDir);
         verify(insert).execute();
         verify(insert).setProgressListener(any(IFileUploadProgressListener.class));
+        verify(file).getRev();
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(dbxClient);
@@ -173,14 +178,14 @@ public class FileServiceTest {
     @Test(expected = FileHandleException.class)
     public void testUploadFileWithStringFilenameAndNullParentAndThrownException() throws IOException, DbxException {
         String filename = "test-filename";
-        DbxEntry.Folder parentDir = null;
+        FolderMetadata parentDir = null;
         FileRequest insert = mock(FileRequest.class);
 
-        when(serviceMock.getPath(anyString(), any(DbxEntry.class))).thenReturn(filename);
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any(Metadata.class))).thenReturn(filename);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(null);
-        when(FileRequest.createInsert(any(DbxClient.class), anyString(), any(File.class))).thenReturn(insert);
+        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(null);
+        when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
         when(insert.execute()).thenThrow(DbxException.class);
 
         try {
@@ -205,18 +210,18 @@ public class FileServiceTest {
     @Test
     public void testUploadFileWithStringFilenameAndFileParentWhereUpdateOnlyContent() throws IOException, DbxException {
         String filename = "test-filename";
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.File file = mock(DbxEntry.File.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FileMetadata file = mock(FileMetadata.class);
         FileRequest update = mock(FileRequest.class);
 
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(file);
-        when(EqualUtils.notEquals(any(DbxEntry.File.class), any(Path.class))).thenReturn(true);
-        when(FileRequest.createUpdate(any(DbxClient.class), any(DbxEntry.File.class), any(File.class))).thenReturn(update);
+        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(file);
+        when(EqualUtils.notEquals(any(FileMetadata.class), any(Path.class))).thenReturn(true);
+        when(FileRequest.createUpdate(any(DbxClientV2.class), any(FileMetadata.class), any(File.class))).thenReturn(update);
         when(update.execute()).thenReturn(file);
 
-        DbxEntry.File result = serviceMock.uploadFile(filename, parentDir);
+        FileMetadata result = serviceMock.uploadFile(filename, parentDir);
 
         assertNotNull(result);
         assertEquals(file, result);
@@ -226,6 +231,7 @@ public class FileServiceTest {
         verify(serviceMock).findFile(filename, parentDir);
         verify(update).execute();
         verify(update).setProgressListener(any(IFileUploadProgressListener.class));
+        verify(file).getRev();
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(dbxClient);
@@ -237,20 +243,21 @@ public class FileServiceTest {
     @Test
     public void testUploadFileWithStringFilenameAndFileParentWhereNothingToUpdate() throws IOException {
         String filename = "test-filename";
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.File file = mock(DbxEntry.File.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FileMetadata file = mock(FileMetadata.class);
 
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.findFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(file);
-        when(EqualUtils.notEquals(any(DbxEntry.File.class), any(Path.class))).thenReturn(false);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(file);
+        when(EqualUtils.notEquals(any(FileMetadata.class), any(Path.class))).thenReturn(false);
 
-        DbxEntry.File result = serviceMock.uploadFile(filename, parentDir);
+        FileMetadata result = serviceMock.uploadFile(filename, parentDir);
 
         assertNotNull(result);
         assertEquals(file, result);
 
         verify(serviceMock).uploadFile(filename, parentDir);
         verify(serviceMock).findFile(filename, parentDir);
+        verify(file).getRev();
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(file);
@@ -260,22 +267,22 @@ public class FileServiceTest {
     @Test
     public void testUploadFileWithStringFilenameAndFileParentAndRetryApplied() throws IOException, DbxException {
         String filename = "test-filename";
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        final DbxEntry.File file = mock(DbxEntry.File.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        final FileMetadata file = mock(FileMetadata.class);
         FileRequest insert = mock(FileRequest.class);
 
-        when(serviceMock.getPath(anyString(), any(DbxEntry.class))).thenReturn(filename);
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any(Metadata.class))).thenReturn(filename);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(null);
+        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(null);
         when(serviceMock.getRetries()).thenReturn(3);
-        when(FileRequest.createInsert(any(DbxClient.class), anyString(), any(File.class))).thenReturn(insert);
+        when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
 
-        Answer<DbxEntry.File> answer = new Answer<DbxEntry.File>() {
+        Answer<FileMetadata> answer = new Answer<FileMetadata>() {
             private int retry = 0;
 
             @Override
-            public DbxEntry.File answer(InvocationOnMock invocation) throws Throwable {
+            public FileMetadata answer(InvocationOnMock invocation) throws Throwable {
                 if (retry == 0) {
                     retry++;
                     throw mock(DbxException.class);
@@ -285,7 +292,7 @@ public class FileServiceTest {
         };
         when(insert.execute()).thenAnswer(answer);
 
-        DbxEntry.File result = serviceMock.uploadFile(filename, parentDir);
+        FileMetadata result = serviceMock.uploadFile(filename, parentDir);
 
         assertNotNull(result);
         assertEquals(file, result);
@@ -297,6 +304,7 @@ public class FileServiceTest {
         verify(serviceMock).getRetries();
         verify(insert, times(2)).execute();
         verify(insert).setProgressListener(any(IFileUploadProgressListener.class));
+        verify(file).getRev();
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(dbxClient);
@@ -308,16 +316,16 @@ public class FileServiceTest {
     @Test(expected = FileHandleException.class)
     public void testUploadFileWithStringFilenameAndFileParentAndRetryExceeded() throws IOException, DbxException {
         String filename = "test-filename";
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        final DbxEntry.File file = mock(DbxEntry.File.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        final FileMetadata file = mock(FileMetadata.class);
         FileRequest insert = mock(FileRequest.class);
 
-        when(serviceMock.getPath(anyString(), any(DbxEntry.class))).thenReturn(filename);
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any(Metadata.class))).thenReturn(filename);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(null);
+        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(null);
         when(serviceMock.getRetries()).thenReturn(3);
-        when(FileRequest.createInsert(any(DbxClient.class), anyString(), any(File.class))).thenReturn(insert);
+        when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
         when(insert.execute()).thenThrow(DbxException.class);
 
         try {
@@ -346,9 +354,9 @@ public class FileServiceTest {
 
     @Test
     public void testUploadFilesWithNullFilenames() {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
-        List<DbxEntry.File> result = service.uploadFiles(null, parent);
+        List<FileMetadata> result = service.uploadFiles(null, parent);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -356,9 +364,9 @@ public class FileServiceTest {
 
     @Test
     public void testUploadFilesWithEmptyListOfFilenames() {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
-        List<DbxEntry.File> result = service.uploadFiles(new ArrayList<String>(), parent);
+        List<FileMetadata> result = service.uploadFiles(new ArrayList<>(), parent);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -366,17 +374,17 @@ public class FileServiceTest {
 
     @Test
     public void testUploadFilesWhereUploadFileThrowsException() {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(serviceMock.uploadFiles(anyListOf(String.class), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenThrow(FileHandleException.class);
+        when(serviceMock.uploadFiles(anyListOf(String.class), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenThrow(FileHandleException.class);
 
-        List<DbxEntry.File> result = serviceMock.uploadFiles(Arrays.asList("filename1", "filename2"), parent);
+        List<FileMetadata> result = serviceMock.uploadFiles(Arrays.asList("filename1", "filename2"), parent);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
 
-        verify(serviceMock).uploadFiles(anyListOf(String.class), any(DbxEntry.Folder.class));
+        verify(serviceMock).uploadFiles(anyListOf(String.class), any(FolderMetadata.class));
         verify(serviceMock).uploadFile("filename1", parent);
         verify(serviceMock).uploadFile("filename2", parent);
 
@@ -385,21 +393,21 @@ public class FileServiceTest {
 
     @Test
     public void testUploadFilesWithListOfFilenames() {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(serviceMock.uploadFiles(anyListOf(String.class), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        DbxEntry.File file1 = mock(DbxEntry.File.class);
-        DbxEntry.File file2 = mock(DbxEntry.File.class);
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(file1, file2);
+        when(serviceMock.uploadFiles(anyListOf(String.class), any(FolderMetadata.class))).thenCallRealMethod();
+        FileMetadata file1 = mock(FileMetadata.class);
+        FileMetadata file2 = mock(FileMetadata.class);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenReturn(file1, file2);
 
-        List<DbxEntry.File> result = serviceMock.uploadFiles(Arrays.asList("filename1", "filename2"), parent);
+        List<FileMetadata> result = serviceMock.uploadFiles(Arrays.asList("filename1", "filename2"), parent);
 
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(file1, result.get(0));
         assertEquals(file2, result.get(1));
 
-        verify(serviceMock).uploadFiles(anyListOf(String.class), any(DbxEntry.Folder.class));
+        verify(serviceMock).uploadFiles(anyListOf(String.class), any(FolderMetadata.class));
         verify(serviceMock).uploadFile("filename1", parent);
         verify(serviceMock).uploadFile("filename2", parent);
 
@@ -410,15 +418,15 @@ public class FileServiceTest {
     public void testUploadFileWithStringFilenameAndStringParentDir() {
         String pathname = "test-parent-dir";
         String filename = "test-filename";
-        DbxEntry.File file = mock(DbxEntry.File.class);
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FileMetadata file = mock(FileMetadata.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
         when(serviceMock.uploadFile(anyString(), anyString())).thenCallRealMethod();
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(file);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenReturn(file);
         when(serviceMock.getUploadDir(anyString())).thenReturn(pathname);
         when(directoryService.findOrCreateDirectory(anyString())).thenReturn(parent);
 
-        DbxEntry.File result = serviceMock.uploadFile(filename, pathname);
+        FileMetadata result = serviceMock.uploadFile(filename, pathname);
 
         assertNotNull(result);
         assertEquals(file, result);
@@ -438,18 +446,18 @@ public class FileServiceTest {
     @Test
     public void testUploadFileWithStringFilename() {
         String filename = "test-filename";
-        DbxEntry.File file = mock(DbxEntry.File.class);
+        FileMetadata file = mock(FileMetadata.class);
 
         when(serviceMock.uploadFile(anyString())).thenCallRealMethod();
-        when(serviceMock.uploadFile(anyString(), any(DbxEntry.Folder.class))).thenReturn(file);
+        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenReturn(file);
 
-        DbxEntry.File result = serviceMock.uploadFile(filename);
+        FileMetadata result = serviceMock.uploadFile(filename);
 
         assertNotNull(result);
         assertEquals(file, result);
 
         verify(serviceMock).uploadFile(filename);
-        verify(serviceMock).uploadFile(filename, (DbxEntry.Folder) null);
+        verify(serviceMock).uploadFile(filename, (FolderMetadata) null);
 
         verifyNoMoreInteractions(serviceMock);
         verifyZeroInteractions(file);
@@ -458,21 +466,21 @@ public class FileServiceTest {
     @Test
     public void testUploadFilesWithStringFilenames() {
         List<String> filenames = Arrays.asList("test-filename1", "test-filename2");
-        DbxEntry.File file1 = mock(DbxEntry.File.class);
-        DbxEntry.File file2 = mock(DbxEntry.File.class);
-        List<DbxEntry.File> files = Arrays.asList(file1, file2);
+        FileMetadata file1 = mock(FileMetadata.class);
+        FileMetadata file2 = mock(FileMetadata.class);
+        List<FileMetadata> files = Arrays.asList(file1, file2);
 
         when(serviceMock.uploadFiles(anyListOf(String.class))).thenCallRealMethod();
-        when(serviceMock.uploadFiles(anyListOf(String.class), any(DbxEntry.Folder.class))).thenReturn(files);
+        when(serviceMock.uploadFiles(anyListOf(String.class), any(FolderMetadata.class))).thenReturn(files);
 
-        List<DbxEntry.File> result = serviceMock.uploadFiles(filenames);
+        List<FileMetadata> result = serviceMock.uploadFiles(filenames);
 
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(files, result);
 
         verify(serviceMock).uploadFiles(filenames);
-        verify(serviceMock).uploadFiles(filenames, (DbxEntry.Folder) null);
+        verify(serviceMock).uploadFiles(filenames, (FolderMetadata) null);
 
         verifyNoMoreInteractions(serviceMock);
         verifyZeroInteractions(file1);
@@ -483,17 +491,17 @@ public class FileServiceTest {
     public void testUploadFilesWithStringFilenamesAndStringParentDir() {
         String parentDir = "test-parent-dir";
         List<String> filenames = Arrays.asList("test-filename1", "test-filename2");
-        DbxEntry.File file1 = mock(DbxEntry.File.class);
-        DbxEntry.File file2 = mock(DbxEntry.File.class);
-        List<DbxEntry.File> files = Arrays.asList(file1, file2);
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FileMetadata file1 = mock(FileMetadata.class);
+        FileMetadata file2 = mock(FileMetadata.class);
+        List<FileMetadata> files = Arrays.asList(file1, file2);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
         when(serviceMock.uploadFiles(anyListOf(String.class), anyString())).thenCallRealMethod();
-        when(serviceMock.uploadFiles(anyListOf(String.class), any(DbxEntry.Folder.class))).thenReturn(files);
+        when(serviceMock.uploadFiles(anyListOf(String.class), any(FolderMetadata.class))).thenReturn(files);
         when(serviceMock.getUploadDir(anyString())).thenReturn(parentDir);
         when(directoryService.findOrCreateDirectory(anyString())).thenReturn(parent);
 
-        List<DbxEntry.File> result = serviceMock.uploadFiles(filenames, parentDir);
+        List<FileMetadata> result = serviceMock.uploadFiles(filenames, parentDir);
 
         assertNotNull(result);
         assertEquals(2, result.size());

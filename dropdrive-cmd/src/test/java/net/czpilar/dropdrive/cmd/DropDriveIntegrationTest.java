@@ -2,6 +2,7 @@ package net.czpilar.dropdrive.cmd;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class DropDriveIntegrationTest {
     private void createFileIfNotExist(String filename) throws IOException {
         File file = new File(filename);
         if (!file.exists()) {
-            FileUtils.writeStringToFile(file, "This is a testing file with filename: " + filename);
+            FileUtils.writeStringToFile(file, "This is a testing file with filename: " + filename, Charset.defaultCharset());
         }
     }
 

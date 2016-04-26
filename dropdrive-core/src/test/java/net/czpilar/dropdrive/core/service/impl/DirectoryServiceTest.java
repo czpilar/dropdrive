@@ -1,8 +1,9 @@
 package net.czpilar.dropdrive.core.service.impl;
 
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.DbxUserFilesRequests;
+import com.dropbox.core.v2.files.FolderMetadata;
 import net.czpilar.dropdrive.core.exception.DirectoryHandleException;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.*;
  * @author David Pilar (david@czpilar.net)
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DbxClient.class, DbxEntry.Folder.class })
+@PrepareForTest({ DbxClientV2.class, DbxUserFilesRequests.class })
 public class DirectoryServiceTest {
 
     private DirectoryService service = new DirectoryService();
@@ -28,13 +29,17 @@ public class DirectoryServiceTest {
     private DirectoryService serviceMock;
 
     @Mock
-    private DbxClient dbxClient;
+    private DbxClientV2 dbxClient;
+
+    @Mock
+    private DbxUserFilesRequests files;
 
     @Before
     public void before() {
         MockitoAnnotations.initMocks(this);
 
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
+        when(dbxClient.files()).thenReturn(files);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -45,13 +50,13 @@ public class DirectoryServiceTest {
     @Test
     public void testCreateOneDirectoryWhereParentDirIsNull() throws DbxException {
         String dirname = "/test-dirname";
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
 
-        when(serviceMock.createOneDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.getPath(anyString(), any(DbxEntry.Folder.class))).thenReturn(dirname);
-        when(dbxClient.createFolder(anyString())).thenReturn(directory);
+        when(serviceMock.createOneDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any(FolderMetadata.class))).thenReturn(dirname);
+        when(files.createFolder(anyString())).thenReturn(directory);
 
-        DbxEntry.Folder result = serviceMock.createOneDirectory(dirname, null);
+        FolderMetadata result = serviceMock.createOneDirectory(dirname, null);
 
         assertNotNull(result);
         assertEquals(directory, result);
@@ -59,7 +64,8 @@ public class DirectoryServiceTest {
         verify(serviceMock).createOneDirectory(dirname, null);
         verify(serviceMock).getPath(dirname, null);
         verify(serviceMock).getDbxClient();
-        verify(dbxClient).createFolder(dirname);
+        verify(dbxClient).files();
+        verify(files).createFolder(dirname);
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(dbxClient);
@@ -69,14 +75,14 @@ public class DirectoryServiceTest {
     @Test
     public void testCreateOneDirectoryWhereParentDirExists() throws DbxException {
         String dirname = "/test-dirname";
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
 
-        when(serviceMock.createOneDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.getPath(anyString(), any(DbxEntry.Folder.class))).thenReturn(dirname);
-        when(dbxClient.createFolder(anyString())).thenReturn(directory);
+        when(serviceMock.createOneDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any(FolderMetadata.class))).thenReturn(dirname);
+        when(files.createFolder(anyString())).thenReturn(directory);
 
-        DbxEntry.Folder result = serviceMock.createOneDirectory(dirname, parentDir);
+        FolderMetadata result = serviceMock.createOneDirectory(dirname, parentDir);
 
         assertNotNull(result);
         assertEquals(directory, result);
@@ -84,7 +90,8 @@ public class DirectoryServiceTest {
         verify(serviceMock).createOneDirectory(dirname, parentDir);
         verify(serviceMock).getPath(dirname, parentDir);
         verify(serviceMock).getDbxClient();
-        verify(dbxClient).createFolder(dirname);
+        verify(dbxClient).files();
+        verify(files).createFolder(dirname);
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(dbxClient);
@@ -94,11 +101,11 @@ public class DirectoryServiceTest {
     @Test(expected = DirectoryHandleException.class)
     public void testCreateOneDirectoryWhereDbxExceptionWasThrown() throws DbxException {
         String dirname = "/test-dirname";
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
 
-        when(serviceMock.createOneDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.getPath(anyString(), any(DbxEntry.Folder.class))).thenReturn(dirname);
-        when(dbxClient.createFolder(anyString())).thenThrow(DbxException.class);
+        when(serviceMock.createOneDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any(FolderMetadata.class))).thenReturn(dirname);
+        when(files.createFolder(anyString())).thenThrow(DbxException.class);
 
         try {
             serviceMock.createOneDirectory(dirname, null);
@@ -106,7 +113,8 @@ public class DirectoryServiceTest {
             verify(serviceMock).createOneDirectory(dirname, null);
             verify(serviceMock).getPath(dirname, null);
             verify(serviceMock).getDbxClient();
-            verify(dbxClient).createFolder(dirname);
+            verify(dbxClient).files();
+            verify(files).createFolder(dirname);
 
             verifyNoMoreInteractions(serviceMock);
             verifyNoMoreInteractions(dbxClient);
@@ -118,14 +126,14 @@ public class DirectoryServiceTest {
 
     @Test
     public void testFindOrCreateOneDirectoryWhereDirectoryIsFound() {
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
         String dirname = "/test-dirname";
 
-        when(serviceMock.findOrCreateOneDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.findFolder(anyString(), any(DbxEntry.Folder.class))).thenReturn(directory);
+        when(serviceMock.findOrCreateOneDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.findFolder(anyString(), any(FolderMetadata.class))).thenReturn(directory);
 
-        DbxEntry.Folder result = serviceMock.findOrCreateOneDirectory(dirname, parentDir);
+        FolderMetadata result = serviceMock.findOrCreateOneDirectory(dirname, parentDir);
 
         assertNotNull(result);
         assertEquals(directory, result);
@@ -141,15 +149,15 @@ public class DirectoryServiceTest {
 
     @Test
     public void testFindOrCreateOneDirectoryWhereDirectoryIsCreated() {
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
         String dirname = "/test-dirname";
 
-        when(serviceMock.findOrCreateOneDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.findFolder(anyString(), any(DbxEntry.Folder.class))).thenReturn(null);
-        when(serviceMock.createOneDirectory(anyString(), any(DbxEntry.Folder.class))).thenReturn(directory);
+        when(serviceMock.findOrCreateOneDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.findFolder(anyString(), any(FolderMetadata.class))).thenReturn(null);
+        when(serviceMock.createOneDirectory(anyString(), any(FolderMetadata.class))).thenReturn(directory);
 
-        DbxEntry.Folder result = serviceMock.findOrCreateOneDirectory(dirname, parentDir);
+        FolderMetadata result = serviceMock.findOrCreateOneDirectory(dirname, parentDir);
 
         assertNotNull(result);
         assertEquals(directory, result);
@@ -167,12 +175,12 @@ public class DirectoryServiceTest {
     @Test
     public void testFindDirectoryWithPathname() {
         String pathname = "/test-pathname";
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
 
         when(serviceMock.findDirectory(anyString())).thenCallRealMethod();
-        when(serviceMock.findDirectory(anyString(), any(DbxEntry.Folder.class))).thenReturn(directory);
+        when(serviceMock.findDirectory(anyString(), any(FolderMetadata.class))).thenReturn(directory);
 
-        DbxEntry.Folder result = serviceMock.findDirectory(pathname);
+        FolderMetadata result = serviceMock.findDirectory(pathname);
 
         assertNotNull(result);
         assertEquals(directory, result);
@@ -185,9 +193,9 @@ public class DirectoryServiceTest {
 
     @Test
     public void testFindDirectoryWithPathnameAndParentWhereDirnameIsNullAndNextPathnameIsNull() {
-        when(serviceMock.findDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
+        when(serviceMock.findDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
 
-        DbxEntry.Folder result = serviceMock.findDirectory(null, null);
+        FolderMetadata result = serviceMock.findDirectory(null, null);
 
         assertNull(result);
 
@@ -201,12 +209,12 @@ public class DirectoryServiceTest {
         String dirname1 = "test-dirname1";
         String dirname2 = "test-dirname2";
         String pathname = dirname1 + "/" + dirname2;
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
 
-        when(serviceMock.findDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.findFolder(anyString(), any(DbxEntry.Folder.class))).thenReturn(null);
+        when(serviceMock.findDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.findFolder(anyString(), any(FolderMetadata.class))).thenReturn(null);
 
-        DbxEntry.Folder result = serviceMock.findDirectory(pathname, parentDir);
+        FolderMetadata result = serviceMock.findDirectory(pathname, parentDir);
 
         assertNull(result);
 
@@ -221,13 +229,13 @@ public class DirectoryServiceTest {
     @Test
     public void testFindDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
         String pathname = "test-dirname";
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
 
-        when(serviceMock.findDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.findFolder(anyString(), any(DbxEntry.Folder.class))).thenReturn(directory);
+        when(serviceMock.findDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.findFolder(anyString(), any(FolderMetadata.class))).thenReturn(directory);
 
-        DbxEntry.Folder result = serviceMock.findDirectory(pathname, parentDir);
+        FolderMetadata result = serviceMock.findDirectory(pathname, parentDir);
 
         assertNotNull(result);
         assertEquals(directory, result);
@@ -247,15 +255,15 @@ public class DirectoryServiceTest {
         String dirname2 = "test-dirname2";
         String dirname3 = "test-dirname3";
         String pathname = dirname1 + "/" + dirname2 + "/" + dirname3;
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory1 = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory2 = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory3 = mock(DbxEntry.Folder.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FolderMetadata directory1 = mock(FolderMetadata.class);
+        FolderMetadata directory2 = mock(FolderMetadata.class);
+        FolderMetadata directory3 = mock(FolderMetadata.class);
 
-        when(serviceMock.findDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.findFolder(anyString(), any(DbxEntry.Folder.class))).thenReturn(directory1, directory2, directory3);
+        when(serviceMock.findDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.findFolder(anyString(), any(FolderMetadata.class))).thenReturn(directory1, directory2, directory3);
 
-        DbxEntry.Folder result = serviceMock.findDirectory(pathname, parentDir);
+        FolderMetadata result = serviceMock.findDirectory(pathname, parentDir);
 
         assertNotNull(result);
         assertEquals(directory3, result);
@@ -278,12 +286,12 @@ public class DirectoryServiceTest {
     @Test
     public void testFindOrCreateDirectoryWithPathname() {
         String pathname = "test-pathname";
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
 
         when(serviceMock.findOrCreateDirectory(anyString())).thenCallRealMethod();
-        when(serviceMock.findOrCreateDirectory(anyString(), any(DbxEntry.Folder.class))).thenReturn(directory);
+        when(serviceMock.findOrCreateDirectory(anyString(), any(FolderMetadata.class))).thenReturn(directory);
 
-        DbxEntry.Folder result = serviceMock.findOrCreateDirectory(pathname);
+        FolderMetadata result = serviceMock.findOrCreateDirectory(pathname);
 
         assertNotNull(result);
         assertEquals(directory, result);
@@ -296,9 +304,9 @@ public class DirectoryServiceTest {
 
     @Test
     public void testFindOrCreateDirectoryWithPathnameAndParentWhereDirnameIsNullAndNextPathnameIsNull() {
-        when(serviceMock.findOrCreateDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
+        when(serviceMock.findOrCreateDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
 
-        DbxEntry.Folder result = serviceMock.findOrCreateDirectory(null, null);
+        FolderMetadata result = serviceMock.findOrCreateDirectory(null, null);
 
         assertNull(result);
 
@@ -310,13 +318,13 @@ public class DirectoryServiceTest {
     @Test
     public void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
         String pathname = "test-dirname";
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory = mock(DbxEntry.Folder.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FolderMetadata directory = mock(FolderMetadata.class);
 
-        when(serviceMock.findOrCreateDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.findOrCreateOneDirectory(anyString(), any(DbxEntry.Folder.class))).thenReturn(directory);
+        when(serviceMock.findOrCreateDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.findOrCreateOneDirectory(anyString(), any(FolderMetadata.class))).thenReturn(directory);
 
-        DbxEntry.Folder result = serviceMock.findOrCreateDirectory(pathname, parentDir);
+        FolderMetadata result = serviceMock.findOrCreateDirectory(pathname, parentDir);
 
         assertNotNull(result);
         assertEquals(directory, result);
@@ -336,15 +344,15 @@ public class DirectoryServiceTest {
         String dirname2 = "test-dirname2";
         String dirname3 = "test-dirname3";
         String pathname = dirname1 + "/" + dirname2 + "/" + dirname3;
-        DbxEntry.Folder parentDir = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory1 = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory2 = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder directory3 = mock(DbxEntry.Folder.class);
+        FolderMetadata parentDir = mock(FolderMetadata.class);
+        FolderMetadata directory1 = mock(FolderMetadata.class);
+        FolderMetadata directory2 = mock(FolderMetadata.class);
+        FolderMetadata directory3 = mock(FolderMetadata.class);
 
-        when(serviceMock.findOrCreateDirectory(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(serviceMock.findOrCreateOneDirectory(anyString(), any(DbxEntry.Folder.class))).thenReturn(directory1, directory2, directory3);
+        when(serviceMock.findOrCreateDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.findOrCreateOneDirectory(anyString(), any(FolderMetadata.class))).thenReturn(directory1, directory2, directory3);
 
-        DbxEntry.Folder result = serviceMock.findOrCreateDirectory(pathname, parentDir);
+        FolderMetadata result = serviceMock.findOrCreateDirectory(pathname, parentDir);
 
         assertNotNull(result);
         assertEquals(directory3, result);

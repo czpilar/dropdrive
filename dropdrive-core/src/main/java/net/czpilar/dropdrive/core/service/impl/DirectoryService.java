@@ -1,7 +1,7 @@
 package net.czpilar.dropdrive.core.service.impl;
 
-import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.FolderMetadata;
 import net.czpilar.dropdrive.core.exception.DirectoryHandleException;
 import net.czpilar.dropdrive.core.service.IDirectoryService;
 import org.apache.commons.lang.StringUtils;
@@ -31,18 +31,18 @@ public class DirectoryService extends AbstractFileService implements IDirectoryS
         return StringUtils.trimToNull(StringUtils.substringAfter(pathname, DIRECTORY_SEPARATOR));
     }
 
-    protected DbxEntry.Folder createOneDirectory(String dirname, DbxEntry.Folder parentDir) {
+    protected FolderMetadata createOneDirectory(String dirname, FolderMetadata parentDir) {
         String path = getPath(dirname, parentDir);
         try {
-            return getDbxClient().createFolder(path);
+            return getDbxClient().files().createFolder(path);
         } catch (DbxException e) {
             LOG.error("Unable to create directory {}.", dirname);
             throw new DirectoryHandleException("Unable to create directory.", e);
         }
     }
 
-    protected DbxEntry.Folder findOrCreateOneDirectory(String dirname, DbxEntry.Folder parentDir) {
-        DbxEntry.Folder dir = findFolder(dirname, parentDir);
+    protected FolderMetadata findOrCreateOneDirectory(String dirname, FolderMetadata parentDir) {
+        FolderMetadata dir = findFolder(dirname, parentDir);
         if (dir == null) {
             dir = createOneDirectory(dirname, parentDir);
         }
@@ -50,15 +50,15 @@ public class DirectoryService extends AbstractFileService implements IDirectoryS
     }
 
     @Override
-    public DbxEntry.Folder findDirectory(String pathname) {
+    public FolderMetadata findDirectory(String pathname) {
         return findDirectory(pathname, null);
     }
 
     @Override
-    public DbxEntry.Folder findDirectory(String pathname, DbxEntry.Folder parentDir) {
+    public FolderMetadata findDirectory(String pathname, FolderMetadata parentDir) {
         pathname = normalizePathname(pathname);
         String dirname = getCurrentDirname(pathname);
-        DbxEntry.Folder currentDir = parentDir;
+        FolderMetadata currentDir = parentDir;
         if (dirname != null) {
             currentDir = findFolder(dirname, parentDir);
         }
@@ -70,15 +70,15 @@ public class DirectoryService extends AbstractFileService implements IDirectoryS
     }
 
     @Override
-    public DbxEntry.Folder findOrCreateDirectory(String pathname) {
+    public FolderMetadata findOrCreateDirectory(String pathname) {
         return findOrCreateDirectory(pathname, null);
     }
 
     @Override
-    public DbxEntry.Folder findOrCreateDirectory(String pathname, DbxEntry.Folder parentDir) {
+    public FolderMetadata findOrCreateDirectory(String pathname, FolderMetadata parentDir) {
         pathname = normalizePathname(pathname);
         String dirname = getCurrentDirname(pathname);
-        DbxEntry.Folder currentDir = parentDir;
+        FolderMetadata currentDir = parentDir;
         if (dirname != null) {
             currentDir = findOrCreateOneDirectory(dirname, parentDir);
         }

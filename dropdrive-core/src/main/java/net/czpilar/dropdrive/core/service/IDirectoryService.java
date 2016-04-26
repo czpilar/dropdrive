@@ -1,6 +1,6 @@
 package net.czpilar.dropdrive.core.service;
 
-import com.dropbox.core.DbxEntry;
+import com.dropbox.core.v2.files.FolderMetadata;
 
 /**
  * Directory service interface.
@@ -16,7 +16,7 @@ public interface IDirectoryService {
      * @param pathname
      * @return found directory or null if directory is not found
      */
-    DbxEntry.Folder findDirectory(String pathname);
+    FolderMetadata findDirectory(String pathname);
 
     /**
      * Finds directory with give pathname where finding starts with given parent.
@@ -26,7 +26,7 @@ public interface IDirectoryService {
      * @param parentDir
      * @return found directory or null if directory is not found
      */
-    DbxEntry.Folder findDirectory(String pathname, DbxEntry.Folder parentDir);
+    FolderMetadata findDirectory(String pathname, FolderMetadata parentDir);
 
     /**
      * Finds directory with given pathname where finding starts with root parent.
@@ -37,7 +37,7 @@ public interface IDirectoryService {
      * @param pathname
      * @return found or created directory
      */
-    DbxEntry.Folder findOrCreateDirectory(String pathname);
+    FolderMetadata findOrCreateDirectory(String pathname);
 
     /**
      * Finds directory with given pathname where finding starts with given parent directory.
@@ -49,5 +49,5 @@ public interface IDirectoryService {
      * @param parentDir
      * @return found or created directory
      */
-    DbxEntry.Folder findOrCreateDirectory(String pathname, DbxEntry.Folder parentDir);
+    FolderMetadata findOrCreateDirectory(String pathname, FolderMetadata parentDir);
 }

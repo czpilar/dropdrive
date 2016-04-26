@@ -3,11 +3,15 @@ package net.czpilar.dropdrive.core.request;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxWriteMode;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.CommitInfo;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.UploadSessionCursor;
+import com.dropbox.core.v2.files.WriteMode;
 import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,52 +25,62 @@ public class FileRequest {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileRequest.class);
 
-    public static final int CHUNK_SIZE = 4194304; // 4MB
-    public static final int CHUNK_RETRIES = 3;
+    public static final int CHUNK_SIZE = 4194304; // 4MB // TODO make chunk size configurable
+    public static final int CHUNK_RETRIES = 5;
 
-    public static FileRequest createInsert(DbxClient dbxClient, String remoteFilePath, File localFile) {
-        return new FileRequest(dbxClient, remoteFilePath, localFile, DbxWriteMode.add());
+    public static FileRequest createInsert(DbxClientV2 dbxClient, String remoteFilePath, File localFile) {
+        return new FileRequest(dbxClient, remoteFilePath, localFile, WriteMode.ADD);
     }
 
-    public static FileRequest createUpdate(DbxClient dbxClient, DbxEntry.File remoteFile, File localFile) {
-        return new FileRequest(dbxClient, remoteFile.path, localFile, DbxWriteMode.update(remoteFile.rev));
+    public static FileRequest createUpdate(DbxClientV2 dbxClient, FileMetadata remoteFile, File localFile) {
+        return new FileRequest(dbxClient, remoteFile.getPathDisplay(), localFile, WriteMode.update(remoteFile.getRev()));
     }
 
-    private final DbxClient dbxClient;
+    private final DbxClientV2 dbxClient;
     private final String remoteFilePath;
     private final File localFile;
-    private final DbxWriteMode dbxWriteMode;
+    private final WriteMode writeMode;
 
     private IFileUploadProgressListener progressListener;
 
-    private FileRequest(DbxClient dbxClient, String remoteFilePath, File localFile, DbxWriteMode dbxWriteMode) {
+    private FileRequest(DbxClientV2 dbxClient, String remoteFilePath, File localFile, WriteMode witeMode) {
         this.dbxClient = dbxClient;
         this.remoteFilePath = remoteFilePath;
         this.localFile = localFile;
-        this.dbxWriteMode = dbxWriteMode;
+        this.writeMode = witeMode;
     }
 
     public void setProgressListener(IFileUploadProgressListener progressListener) {
         this.progressListener = progressListener;
     }
 
-    public DbxEntry.File execute() throws IOException, DbxException {
-        int offsetBytes = 0;
+    public FileMetadata execute() throws IOException, DbxException {
+        long offsetBytes = 0;
 
         progress(IFileUploadProgressListener.State.INITIATION, offsetBytes);
 
         FileInputStream stream = new FileInputStream(localFile);
+        long size = localFile.length();
 
-        byte[] data = new byte[CHUNK_SIZE];
         try {
             String chunkId = null;
-            int readBytes;
-            while ((readBytes = stream.read(data)) != -1) {
-                chunkId = uploadChunkWithRetries(offsetBytes, data, chunkId, readBytes);
+
+            while (offsetBytes < size) {
+                long readBytes = size - offsetBytes;
+                if (readBytes > CHUNK_SIZE) {
+                    readBytes = CHUNK_SIZE;
+                }
+                chunkId = uploadChunkWithRetries(offsetBytes, stream, chunkId, readBytes);
                 offsetBytes += readBytes;
                 progress(IFileUploadProgressListener.State.IN_PROGRESS, offsetBytes);
             }
-            DbxEntry.File file = dbxClient.chunkedUploadFinish(remoteFilePath, dbxWriteMode, chunkId);
+
+            UploadSessionCursor cursor = new UploadSessionCursor(chunkId, offsetBytes);
+            CommitInfo commitInfo = CommitInfo.newBuilder(remoteFilePath)
+                    .withMode(writeMode)
+                    .withClientModified(new Date(localFile.lastModified()))
+                    .build();
+            FileMetadata file = dbxClient.files().uploadSessionFinish(cursor, commitInfo).finish();
             progress(IFileUploadProgressListener.State.COMPLETE, offsetBytes);
             return file;
         } finally {
@@ -74,11 +88,11 @@ public class FileRequest {
         }
     }
 
-    private String uploadChunkWithRetries(int offsetBytes, byte[] data, String chunkId, int readBytes) throws DbxException {
+    private String uploadChunkWithRetries(long offsetBytes, InputStream stream, String chunkId, long readBytes) throws DbxException, IOException {
         int retry = 0;
         while (true) {
             try {
-                return uploadChunk(offsetBytes, data, chunkId, readBytes);
+                return uploadChunk(offsetBytes, stream, chunkId, readBytes);
             } catch (DbxException e) {
                 retry++;
                 if (retry > CHUNK_RETRIES) {
@@ -89,12 +103,13 @@ public class FileRequest {
         }
     }
 
-    private String uploadChunk(int offset, byte[] data, String chunkId, int read) throws DbxException {
+    private String uploadChunk(long offset, InputStream stream, String chunkId, long read) throws DbxException, IOException {
         if (offset == 0) {
             progress(IFileUploadProgressListener.State.IN_PROGRESS, offset);
-            chunkId = dbxClient.chunkedUploadFirst(data, 0, read);
+            return dbxClient.files().uploadSessionStart()
+                    .uploadAndFinish(stream, read).getSessionId();
         } else {
-            dbxClient.chunkedUploadAppend(chunkId, offset, data, 0, read);
+            dbxClient.files().uploadSessionAppend(chunkId, offset).uploadAndFinish(stream, read);
         }
         return chunkId;
     }

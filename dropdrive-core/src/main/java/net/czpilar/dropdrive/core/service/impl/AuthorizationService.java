@@ -29,7 +29,7 @@ public class AuthorizationService extends AbstractService implements IAuthorizat
     @Override
     public Credential authorize(String authorizationCode) {
         try {
-            Credential credential = new Credential(dbxWebAuth.finish(authorizationCode).accessToken);
+            Credential credential = new Credential(dbxWebAuth.finish(authorizationCode).getAccessToken());
             getDropDriveCredential().saveCredential(credential);
             return credential;
         } catch (DbxException e) {

@@ -5,8 +5,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
 import net.czpilar.dropdrive.core.exception.FileHandleException;
 import net.czpilar.dropdrive.core.listener.impl.FileUploadProgressListener;
 import net.czpilar.dropdrive.core.request.FileRequest;
@@ -55,12 +56,12 @@ public class FileService extends AbstractFileService implements IFileService {
     }
 
     @Override
-    public DbxEntry.File uploadFile(String filename, String pathname) {
-        DbxEntry.Folder parentDir = getDirectoryService().findOrCreateDirectory(getUploadDir(pathname));
+    public FileMetadata uploadFile(String filename, String pathname) {
+        FolderMetadata parentDir = getDirectoryService().findOrCreateDirectory(getUploadDir(pathname));
         return uploadFile(filename, parentDir);
     }
 
-    private DbxEntry.File insertFile(Path pathToFile, DbxEntry.Folder parentDir) throws Exception {
+    private FileMetadata insertFile(Path pathToFile, FolderMetadata parentDir) throws Exception {
         String filename = pathToFile.getFileName().toString();
         LOG.info("Uploading new file {}", filename);
         FileRequest request = FileRequest.createInsert(getDbxClient(), getPath(filename, parentDir), pathToFile.toFile());
@@ -68,7 +69,7 @@ public class FileService extends AbstractFileService implements IFileService {
         return execute(request);
     }
 
-    private DbxEntry.File updateFile(DbxEntry.File currentFile, Path pathToFile) throws Exception {
+    private FileMetadata updateFile(FileMetadata currentFile, Path pathToFile) throws Exception {
         String filename = pathToFile.getFileName().toString();
         LOG.info("Uploading updated file {}", filename);
         FileRequest request = FileRequest.createUpdate(getDbxClient(), currentFile, pathToFile.toFile());
@@ -76,7 +77,7 @@ public class FileService extends AbstractFileService implements IFileService {
         return execute(request);
     }
 
-    private DbxEntry.File execute(FileRequest request) throws Exception {
+    private FileMetadata execute(FileRequest request) throws Exception {
         int retry = 0;
         while (true) {
             try {
@@ -92,10 +93,10 @@ public class FileService extends AbstractFileService implements IFileService {
     }
 
     @Override
-    public DbxEntry.File uploadFile(String filename, DbxEntry.Folder parentDir) {
+    public FileMetadata uploadFile(String filename, FolderMetadata parentDir) {
         try {
             Path pathToFile = Paths.get(filename);
-            DbxEntry.File currentFile = findFile(pathToFile.getFileName().toString(), parentDir);
+            FileMetadata currentFile = findFile(pathToFile.getFileName().toString(), parentDir);
 
             if (currentFile == null) {
                 currentFile = insertFile(pathToFile, parentDir);
@@ -105,7 +106,7 @@ public class FileService extends AbstractFileService implements IFileService {
                 LOG.info("There is nothing to upload.");
             }
 
-            LOG.info("Finished uploading file {} - remote revision is {}", filename, currentFile.rev);
+            LOG.info("Finished uploading file {} - remote revision is {}", filename, currentFile.getRev());
             return currentFile;
         } catch (Exception e) {
             LOG.error("Unable to upload file {}.", filename);
@@ -114,24 +115,24 @@ public class FileService extends AbstractFileService implements IFileService {
     }
 
     @Override
-    public DbxEntry.File uploadFile(String filename) {
-        return uploadFile(filename, (DbxEntry.Folder) null);
+    public FileMetadata uploadFile(String filename) {
+        return uploadFile(filename, (FolderMetadata) null);
     }
 
     @Override
-    public List<DbxEntry.File> uploadFiles(List<String> filenames) {
-        return uploadFiles(filenames, (DbxEntry.Folder) null);
+    public List<FileMetadata> uploadFiles(List<String> filenames) {
+        return uploadFiles(filenames, (FolderMetadata) null);
     }
 
     @Override
-    public List<DbxEntry.File> uploadFiles(List<String> filenames, String pathname) {
-        DbxEntry.Folder parentDir = getDirectoryService().findOrCreateDirectory(getUploadDir(pathname));
+    public List<FileMetadata> uploadFiles(List<String> filenames, String pathname) {
+        FolderMetadata parentDir = getDirectoryService().findOrCreateDirectory(getUploadDir(pathname));
         return uploadFiles(filenames, parentDir);
     }
 
     @Override
-    public List<DbxEntry.File> uploadFiles(List<String> filenames, DbxEntry.Folder parentDir) {
-        List<DbxEntry.File> files = new ArrayList<DbxEntry.File>();
+    public List<FileMetadata> uploadFiles(List<String> filenames, FolderMetadata parentDir) {
+        List<FileMetadata> files = new ArrayList<>();
         if (filenames != null) {
             for (String filename : filenames) {
                 try {

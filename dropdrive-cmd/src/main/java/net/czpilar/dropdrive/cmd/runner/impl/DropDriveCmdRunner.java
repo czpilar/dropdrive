@@ -3,7 +3,7 @@ package net.czpilar.dropdrive.cmd.runner.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import com.dropbox.core.DbxEntry;
+import com.dropbox.core.v2.files.FileMetadata;
 import net.czpilar.dropdrive.cmd.credential.PropertiesDropDriveCredential;
 import net.czpilar.dropdrive.cmd.exception.CommandLineException;
 import net.czpilar.dropdrive.cmd.runner.IDropDriveCmdRunner;
@@ -119,10 +119,10 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
     private void doFileOption(CommandLine cmd) {
         if (cmd.hasOption(OPTION_FILE)) {
             String dir = cmd.hasOption(OPTION_DIRECTORY) ? cmd.getOptionValue(OPTION_DIRECTORY) : null;
-            List<DbxEntry.File> files = fileService.uploadFiles(Arrays.asList(cmd.getOptionValues(OPTION_FILE)), dir);
+            List<FileMetadata> files = fileService.uploadFiles(Arrays.asList(cmd.getOptionValues(OPTION_FILE)), dir);
             System.out.println("Uploaded " + files.size() + " file(s)...");
-            for (DbxEntry.File file : files) {
-                System.out.println("- " + file.name + " (remote revision: " + file.rev + ")");
+            for (FileMetadata file : files) {
+                System.out.println("- " + file.getName() + " (remote revision: " + file.getRev() + ")");
             }
         }
     }

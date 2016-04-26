@@ -1,6 +1,6 @@
 package net.czpilar.dropdrive.core.service.impl;
 
-import com.dropbox.core.DbxClient;
+import com.dropbox.core.v2.DbxClientV2;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -29,8 +29,8 @@ public abstract class AbstractService {
         this.dropDriveCredential = dropDriveCredential;
     }
 
-    protected DbxClient getDbxClient() {
-        return applicationContext.getBean(DbxClient.class);
+    protected DbxClientV2 getDbxClient() {
+        return applicationContext.getBean(DbxClientV2.class);
     }
 
 }

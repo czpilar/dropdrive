@@ -3,7 +3,7 @@ package net.czpilar.dropdrive.cmd.runner.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import com.dropbox.core.DbxEntry;
+import com.dropbox.core.v2.files.FileMetadata;
 import net.czpilar.dropdrive.cmd.credential.PropertiesDropDriveCredential;
 import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.service.IAuthorizationService;
@@ -17,11 +17,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyListOf;
@@ -31,8 +28,6 @@ import static org.mockito.Mockito.*;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ DbxEntry.File.class })
 public class DropDriveCmdRunnerTest {
 
     private DropDriveCmdRunner runner = new DropDriveCmdRunner();
@@ -414,9 +409,9 @@ public class DropDriveCmdRunnerTest {
         List<String> optionFiles = Arrays.asList(optionFile);
         String[] args = { "arg1", "arg2" };
         Option[] optionList = { mock(Option.class), mock(Option.class) };
-        DbxEntry.File file1 = mock(DbxEntry.File.class);
-        DbxEntry.File file2 = mock(DbxEntry.File.class);
-        List<DbxEntry.File> files = Arrays.asList(file1, file2);
+        FileMetadata file1 = mock(FileMetadata.class);
+        FileMetadata file2 = mock(FileMetadata.class);
+        List<FileMetadata> files = Arrays.asList(file1, file2);
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -447,6 +442,10 @@ public class DropDriveCmdRunnerTest {
         verify(commandLine).getOptionValue(DropDriveCmdRunner.OPTION_DIRECTORY);
         verify(propertiesDropDriveCredential).setPropertyFile(propertiesValue);
         verify(fileService).uploadFiles(optionFiles, optionDirectory);
+        verify(file1).getName();
+        verify(file1).getRev();
+        verify(file2).getName();
+        verify(file2).getRev();
 
         verifyNoMoreInteractions(commandLineParser);
         verifyNoMoreInteractions(helpFormatter);

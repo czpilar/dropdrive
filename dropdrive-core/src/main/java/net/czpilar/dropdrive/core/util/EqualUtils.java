@@ -3,7 +3,7 @@ package net.czpilar.dropdrive.core.util;
 import java.io.File;
 import java.nio.file.Path;
 
-import com.dropbox.core.DbxEntry;
+import com.dropbox.core.v2.files.FileMetadata;
 
 /**
  * Equal utility class.
@@ -19,13 +19,26 @@ public class EqualUtils {
      * @param pathToFile
      * @return
      */
-    public static boolean equals(DbxEntry.File file, Path pathToFile) {
+    public static boolean equals(FileMetadata file, Path pathToFile) {
         boolean result = false;
         if (file != null && pathToFile != null) {
             File localFile = pathToFile.toFile();
-            result = localFile.exists() && file.numBytes == localFile.length() && file.lastModified.getTime() >= localFile.lastModified();
+            if (localFile.exists()) {
+                result = file.getSize() == localFile.length()
+                        && toSeconds(file.getClientModified().getTime()) >= toSeconds(localFile.lastModified());
+            }
         }
         return result;
+    }
+
+    /**
+     * This method strips milliseconds and returns seconds.
+     *
+     * @param milliseconds
+     * @return
+     */
+    private static long toSeconds(long milliseconds) {
+        return milliseconds / 1000;
     }
 
     /**
@@ -35,7 +48,7 @@ public class EqualUtils {
      * @param pathToFile
      * @return
      */
-    public static boolean notEquals(DbxEntry.File file, Path pathToFile) {
+    public static boolean notEquals(FileMetadata file, Path pathToFile) {
         return !equals(file, pathToFile);
     }
 

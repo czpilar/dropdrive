@@ -2,7 +2,8 @@ package net.czpilar.dropdrive.core.service;
 
 import java.util.List;
 
-import com.dropbox.core.DbxEntry;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
 
 /**
  * File service interface.
@@ -17,7 +18,7 @@ public interface IFileService {
      * @param filename
      * @return uploaded file
      */
-    DbxEntry.File uploadFile(String filename);
+    FileMetadata uploadFile(String filename);
 
     /**
      * Upload file to directory specified by pathname starting on root level.
@@ -27,7 +28,7 @@ public interface IFileService {
      * @param pathname
      * @return uploaded file
      */
-    DbxEntry.File uploadFile(String pathToFile, String pathname);
+    FileMetadata uploadFile(String pathToFile, String pathname);
 
     /**
      * Upload file to directory specified by given filename.
@@ -38,7 +39,7 @@ public interface IFileService {
      * @param parentDir
      * @return uploaded file
      */
-    DbxEntry.File uploadFile(String filename, DbxEntry.Folder parentDir);
+    FileMetadata uploadFile(String filename, FolderMetadata parentDir);
 
     /**
      * Upload files to root directory.
@@ -46,7 +47,7 @@ public interface IFileService {
      * @param filenames
      * @return uploaded files
      */
-    List<DbxEntry.File> uploadFiles(List<String> filenames);
+    List<FileMetadata> uploadFiles(List<String> filenames);
 
     /**
      * Upload files to directory specified by pathname starting on root level.
@@ -56,7 +57,7 @@ public interface IFileService {
      * @param pathname
      * @return uploaded files
      */
-    List<DbxEntry.File> uploadFiles(List<String> filenames, String pathname);
+    List<FileMetadata> uploadFiles(List<String> filenames, String pathname);
 
     /**
      * Upload files to directory.
@@ -65,5 +66,5 @@ public interface IFileService {
      * @param parentDir
      * @return uploaded files
      */
-    List<DbxEntry.File> uploadFiles(List<String> filenames, DbxEntry.Folder parentDir);
+    List<FileMetadata> uploadFiles(List<String> filenames, FolderMetadata parentDir);
 }

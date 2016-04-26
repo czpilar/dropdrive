@@ -1,8 +1,11 @@
 package net.czpilar.dropdrive.core.service.impl;
 
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.DbxUserFilesRequests;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
+import com.dropbox.core.v2.files.Metadata;
 import net.czpilar.dropdrive.core.exception.FileHandleException;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,27 +19,31 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DbxClient.class, DbxEntry.File.class, DbxEntry.Folder.class })
+@PrepareForTest({ DbxClientV2.class, DbxUserFilesRequests.class })
 public class AbstractFileServiceTest {
 
     @Mock
     private AbstractFileService service;
 
     @Mock
-    private DbxClient dbxClient;
+    private DbxClientV2 dbxClient;
+
+    @Mock
+    private DbxUserFilesRequests files;
 
     @Before
     public void before() {
         MockitoAnnotations.initMocks(this);
 
         when(service.getDbxClient()).thenReturn(dbxClient);
+        when(dbxClient.files()).thenReturn(files);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetPathWithNullFilename() {
-        DbxEntry entry = mock(DbxEntry.class);
+        Metadata entry = mock(Metadata.class);
 
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(Metadata.class))).thenCallRealMethod();
 
         try {
             service.getPath(null, entry);
@@ -51,7 +58,7 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testGetPathWithFilenameAndNullParent() {
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(Metadata.class))).thenCallRealMethod();
 
         String result = service.getPath("filename", null);
 
@@ -65,7 +72,7 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testGetPathWithFilenameStartingWithSlashAndNullParent() {
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(Metadata.class))).thenCallRealMethod();
 
         String result = service.getPath("/filename", null);
 
@@ -79,9 +86,9 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testGetPathWithFilenameAndExistingParent() {
-        DbxEntry.Folder parent = new DbxEntry.Folder("/path/to/parent", "icon", false);
+        FolderMetadata parent = new FolderMetadata("icon", "/path/to/parent", "/path/to/parent", "id");
 
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(Metadata.class))).thenCallRealMethod();
 
         String result = service.getPath("filename", parent);
 
@@ -95,20 +102,21 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testFindFolderWhenEntryIsNull() throws DbxException {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(service.findFolder(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenReturn("/path/to/entry");
-        when(dbxClient.getMetadata(anyString())).thenReturn(null);
+        when(service.findFolder(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(Metadata.class))).thenReturn("/path/to/entry");
+        when(files.getMetadata(anyString())).thenReturn(null);
 
-        DbxEntry.Folder result = service.findFolder("filename", parent);
+        FolderMetadata result = service.findFolder("filename", parent);
 
         assertNull(result);
 
         verify(service).getDbxClient();
         verify(service).findFolder("filename", parent);
         verify(service).getPath("filename", parent);
-        verify(dbxClient).getMetadata("/path/to/entry");
+        verify(dbxClient).files();
+        verify(files).getMetadata("/path/to/entry");
 
         verifyNoMoreInteractions(service);
         verifyNoMoreInteractions(dbxClient);
@@ -116,23 +124,22 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testFindFolderWhenEntryIsFile() throws DbxException {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
-        DbxEntry.File entry = mock(DbxEntry.File.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
+        FileMetadata entry = mock(FileMetadata.class);
 
-        when(entry.isFolder()).thenReturn(false);
-        when(service.findFolder(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenReturn("/path/to/entry");
-        when(dbxClient.getMetadata(anyString())).thenReturn(entry);
+        when(service.findFolder(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(FileMetadata.class))).thenReturn("/path/to/entry");
+        when(files.getMetadata(anyString())).thenReturn(entry);
 
-        DbxEntry.Folder result = service.findFolder("filename", parent);
+        FolderMetadata result = service.findFolder("filename", parent);
 
         assertNull(result);
 
         verify(service).getDbxClient();
         verify(service).findFolder("filename", parent);
         verify(service).getPath("filename", parent);
-        verify(dbxClient).getMetadata("/path/to/entry");
-        verify(entry).isFolder();
+        verify(dbxClient).files();
+        verify(files).getMetadata("/path/to/entry");
 
         verifyNoMoreInteractions(service);
         verifyNoMoreInteractions(dbxClient);
@@ -141,15 +148,14 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testFindFolderWhenEntryIsFolder() throws DbxException {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
-        DbxEntry.Folder entry = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
+        FolderMetadata entry = mock(FolderMetadata.class);
 
-        when(entry.isFolder()).thenReturn(true);
-        when(service.findFolder(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenReturn("/path/to/entry");
-        when(dbxClient.getMetadata(anyString())).thenReturn(entry);
+        when(service.findFolder(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(FileMetadata.class))).thenReturn("/path/to/entry");
+        when(files.getMetadata(anyString())).thenReturn(entry);
 
-        DbxEntry.Folder result = service.findFolder("filename", parent);
+        FolderMetadata result = service.findFolder("filename", parent);
 
         assertNotNull(result);
         assertEquals(entry, result);
@@ -157,8 +163,8 @@ public class AbstractFileServiceTest {
         verify(service).getDbxClient();
         verify(service).findFolder("filename", parent);
         verify(service).getPath("filename", parent);
-        verify(dbxClient).getMetadata("/path/to/entry");
-        verify(entry).isFolder();
+        verify(dbxClient).files();
+        verify(files).getMetadata("/path/to/entry");
 
         verifyNoMoreInteractions(service);
         verifyNoMoreInteractions(dbxClient);
@@ -167,11 +173,11 @@ public class AbstractFileServiceTest {
 
     @Test(expected = FileHandleException.class)
     public void testFindFolderWhenException() throws DbxException {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(service.findFolder(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenReturn("/path/to/entry");
-        when(dbxClient.getMetadata(anyString())).thenThrow(DbxException.class);
+        when(service.findFolder(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(FileMetadata.class))).thenReturn("/path/to/entry");
+        when(files.getMetadata(anyString())).thenThrow(DbxException.class);
 
         try {
             service.findFolder("filename", parent);
@@ -179,7 +185,8 @@ public class AbstractFileServiceTest {
             verify(service).getDbxClient();
             verify(service).findFolder("filename", parent);
             verify(service).getPath("filename", parent);
-            verify(dbxClient).getMetadata("/path/to/entry");
+            verify(dbxClient).files();
+            verify(files).getMetadata("/path/to/entry");
 
             verifyNoMoreInteractions(service);
             verifyNoMoreInteractions(dbxClient);
@@ -190,20 +197,21 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testFindFileWhenEntryIsNull() throws DbxException {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(service.findFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenReturn("/path/to/entry");
-        when(dbxClient.getMetadata(anyString())).thenReturn(null);
+        when(service.findFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(FileMetadata.class))).thenReturn("/path/to/entry");
+        when(files.getMetadata(anyString())).thenReturn(null);
 
-        DbxEntry.File result = service.findFile("filename", parent);
+        FileMetadata result = service.findFile("filename", parent);
 
         assertNull(result);
 
         verify(service).getDbxClient();
         verify(service).findFile("filename", parent);
         verify(service).getPath("filename", parent);
-        verify(dbxClient).getMetadata("/path/to/entry");
+        verify(dbxClient).files();
+        verify(files).getMetadata("/path/to/entry");
 
         verifyNoMoreInteractions(service);
         verifyNoMoreInteractions(dbxClient);
@@ -211,23 +219,22 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testFindFileWhenEntryIsFolder() throws DbxException {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
-        DbxEntry.File entry = mock(DbxEntry.File.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
+        FolderMetadata entry = mock(FolderMetadata.class);
 
-        when(entry.isFile()).thenReturn(false);
-        when(service.findFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenReturn("/path/to/entry");
-        when(dbxClient.getMetadata(anyString())).thenReturn(entry);
+        when(service.findFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(FileMetadata.class))).thenReturn("/path/to/entry");
+        when(files.getMetadata(anyString())).thenReturn(entry);
 
-        DbxEntry.File result = service.findFile("filename", parent);
+        FileMetadata result = service.findFile("filename", parent);
 
         assertNull(result);
 
         verify(service).getDbxClient();
         verify(service).findFile("filename", parent);
         verify(service).getPath("filename", parent);
-        verify(dbxClient).getMetadata("/path/to/entry");
-        verify(entry).isFile();
+        verify(dbxClient).files();
+        verify(files).getMetadata("/path/to/entry");
 
         verifyNoMoreInteractions(service);
         verifyNoMoreInteractions(dbxClient);
@@ -236,15 +243,14 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testFindFileWhenEntryIsFile() throws DbxException {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
-        DbxEntry.File entry = mock(DbxEntry.File.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
+        FileMetadata entry = mock(FileMetadata.class);
 
-        when(entry.isFile()).thenReturn(true);
-        when(service.findFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenReturn("/path/to/entry");
-        when(dbxClient.getMetadata(anyString())).thenReturn(entry);
+        when(service.findFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(FileMetadata.class))).thenReturn("/path/to/entry");
+        when(files.getMetadata(anyString())).thenReturn(entry);
 
-        DbxEntry.File result = service.findFile("filename", parent);
+        FileMetadata result = service.findFile("filename", parent);
 
         assertNotNull(result);
         assertEquals(entry, result);
@@ -252,8 +258,8 @@ public class AbstractFileServiceTest {
         verify(service).getDbxClient();
         verify(service).findFile("filename", parent);
         verify(service).getPath("filename", parent);
-        verify(dbxClient).getMetadata("/path/to/entry");
-        verify(entry).isFile();
+        verify(dbxClient).files();
+        verify(files).getMetadata("/path/to/entry");
 
         verifyNoMoreInteractions(service);
         verifyNoMoreInteractions(dbxClient);
@@ -262,11 +268,11 @@ public class AbstractFileServiceTest {
 
     @Test(expected = FileHandleException.class)
     public void testFindFileWhenException() throws DbxException {
-        DbxEntry.Folder parent = mock(DbxEntry.Folder.class);
+        FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(service.findFile(anyString(), any(DbxEntry.Folder.class))).thenCallRealMethod();
-        when(service.getPath(anyString(), any(DbxEntry.class))).thenReturn("/path/to/entry");
-        when(dbxClient.getMetadata(anyString())).thenThrow(DbxException.class);
+        when(service.findFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(service.getPath(anyString(), any(FileMetadata.class))).thenReturn("/path/to/entry");
+        when(files.getMetadata(anyString())).thenThrow(DbxException.class);
 
         try {
             service.findFile("filename", parent);
@@ -274,7 +280,8 @@ public class AbstractFileServiceTest {
             verify(service).getDbxClient();
             verify(service).findFile("filename", parent);
             verify(service).getPath("filename", parent);
-            verify(dbxClient).getMetadata("/path/to/entry");
+            verify(dbxClient).files();
+            verify(files).getMetadata("/path/to/entry");
 
             verifyNoMoreInteractions(service);
             verifyNoMoreInteractions(dbxClient);

@@ -1,6 +1,6 @@
 package net.czpilar.dropdrive.core.service.impl;
 
-import com.dropbox.core.DbxClient;
+import com.dropbox.core.v2.DbxClientV2;
 import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import org.junit.Before;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
  * @author David Pilar (david@czpilar.net)
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DbxClient.class })
+@PrepareForTest({ DbxClientV2.class })
 public class AbstractServiceTest {
 
     private AbstractService service;
@@ -34,7 +34,7 @@ public class AbstractServiceTest {
     private ApplicationContext applicationContext;
 
     @Mock
-    private DbxClient dbxClient;
+    private DbxClientV2 dbxClient;
 
     @Before
     public void before() {
@@ -43,7 +43,7 @@ public class AbstractServiceTest {
         };
         service.setApplicationContext(applicationContext);
 
-        when(applicationContext.getBean(DbxClient.class)).thenReturn(dbxClient);
+        when(applicationContext.getBean(DbxClientV2.class)).thenReturn(dbxClient);
     }
 
     @Test
@@ -57,12 +57,12 @@ public class AbstractServiceTest {
 
     @Test
     public void testGetDbxClient() {
-        DbxClient result = service.getDbxClient();
+        DbxClientV2 result = service.getDbxClient();
 
         assertNotNull(result);
         assertEquals(dbxClient, result);
 
-        verify(applicationContext).getBean(DbxClient.class);
+        verify(applicationContext).getBean(DbxClientV2.class);
 
         verifyNoMoreInteractions(applicationContext);
     }
