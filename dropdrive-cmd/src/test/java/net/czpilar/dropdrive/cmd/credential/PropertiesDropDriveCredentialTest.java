@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author David Pilar (david@czpilar.net)
@@ -20,6 +19,7 @@ public class PropertiesDropDriveCredentialTest {
     private static final String UPLOAD_DIR_PROPERTY_KEY = "dropdrive.uploadDir";
     private static final String ACCESS_TOKEN_PROPERTY_KEY = "dropdrive.accessToken";
     private static final String DEFAULT_UPLOAD_DIR = "dropdrive-uploads";
+
 
     private PropertiesDropDriveCredential dropDrivePropertiesNotExist;
     private PropertiesDropDriveCredential dropDrivePropertiesExist;
@@ -61,11 +61,6 @@ public class PropertiesDropDriveCredentialTest {
         if (file.exists()) {
             file.delete();
         }
-    }
-
-    @Test
-    public void testGetAccessTokenWherePropertiesNotExist() {
-        assertNull(dropDrivePropertiesNotExist.getAccessToken());
     }
 
     @Test
