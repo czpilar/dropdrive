@@ -2,6 +2,7 @@ package net.czpilar.dropdrive.core.service.impl;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.CreateFolderResult;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.FolderMetadata;
 import net.czpilar.dropdrive.core.exception.DirectoryHandleException;
@@ -51,10 +52,12 @@ public class DirectoryServiceTest {
     public void testCreateOneDirectoryWhereParentDirIsNull() throws DbxException {
         String dirname = "/test-dirname";
         FolderMetadata directory = mock(FolderMetadata.class);
+        CreateFolderResult createFolderResult = mock(CreateFolderResult.class);
+        when(createFolderResult.getMetadata()).thenReturn(directory);
 
         when(serviceMock.createOneDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getPath(anyString(), any(FolderMetadata.class))).thenReturn(dirname);
-        when(files.createFolder(anyString())).thenReturn(directory);
+        when(files.createFolderV2(anyString())).thenReturn(createFolderResult);
 
         FolderMetadata result = serviceMock.createOneDirectory(dirname, null);
 
@@ -65,11 +68,13 @@ public class DirectoryServiceTest {
         verify(serviceMock).getPath(dirname, null);
         verify(serviceMock).getDbxClient();
         verify(dbxClient).files();
-        verify(files).createFolder(dirname);
+        verify(files).createFolderV2(dirname);
+        verify(createFolderResult).getMetadata();
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(dbxClient);
         verifyZeroInteractions(directory);
+        verifyNoMoreInteractions(createFolderResult);
     }
 
     @Test
@@ -77,10 +82,12 @@ public class DirectoryServiceTest {
         String dirname = "/test-dirname";
         FolderMetadata parentDir = mock(FolderMetadata.class);
         FolderMetadata directory = mock(FolderMetadata.class);
+        CreateFolderResult createFolderResult = mock(CreateFolderResult.class);
+        when(createFolderResult.getMetadata()).thenReturn(directory);
 
         when(serviceMock.createOneDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getPath(anyString(), any(FolderMetadata.class))).thenReturn(dirname);
-        when(files.createFolder(anyString())).thenReturn(directory);
+        when(files.createFolderV2(anyString())).thenReturn(createFolderResult);
 
         FolderMetadata result = serviceMock.createOneDirectory(dirname, parentDir);
 
@@ -91,11 +98,13 @@ public class DirectoryServiceTest {
         verify(serviceMock).getPath(dirname, parentDir);
         verify(serviceMock).getDbxClient();
         verify(dbxClient).files();
-        verify(files).createFolder(dirname);
+        verify(files).createFolderV2(dirname);
+        verify(createFolderResult).getMetadata();
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(dbxClient);
         verifyZeroInteractions(directory);
+        verifyNoMoreInteractions(createFolderResult);
     }
 
     @Test(expected = DirectoryHandleException.class)
@@ -105,7 +114,7 @@ public class DirectoryServiceTest {
 
         when(serviceMock.createOneDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.getPath(anyString(), any(FolderMetadata.class))).thenReturn(dirname);
-        when(files.createFolder(anyString())).thenThrow(DbxException.class);
+        when(files.createFolderV2(anyString())).thenThrow(DbxException.class);
 
         try {
             serviceMock.createOneDirectory(dirname, null);
@@ -114,7 +123,7 @@ public class DirectoryServiceTest {
             verify(serviceMock).getPath(dirname, null);
             verify(serviceMock).getDbxClient();
             verify(dbxClient).files();
-            verify(files).createFolder(dirname);
+            verify(files).createFolderV2(dirname);
 
             verifyNoMoreInteractions(serviceMock);
             verifyNoMoreInteractions(dbxClient);

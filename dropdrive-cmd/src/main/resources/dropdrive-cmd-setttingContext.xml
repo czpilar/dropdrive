@@ -10,9 +10,9 @@
 
     <bean id="dropdrive-cmd-propertiesDropDriveCredential"
           class="net.czpilar.dropdrive.cmd.credential.PropertiesDropDriveCredential">
-        <property name="uploadDirPropertyKey" value="dropdrive.uploadDir" />
-        <property name="accessTokenPropertyKey" value="dropdrive.accessToken" />
-        <property name="defaultUploadDir" value="dropdrive-uploads" />
+        <constructor-arg name="uploadDirPropertyKey" value="dropdrive.uploadDir" />
+        <constructor-arg name="accessTokenPropertyKey" value="dropdrive.accessToken" />
+        <constructor-arg name="defaultUploadDir" value="dropdrive-uploads" />
     </bean>
 
 </beans>

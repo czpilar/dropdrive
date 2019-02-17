@@ -34,7 +34,7 @@ public class DirectoryService extends AbstractFileService implements IDirectoryS
     protected FolderMetadata createOneDirectory(String dirname, FolderMetadata parentDir) {
         String path = getPath(dirname, parentDir);
         try {
-            return getDbxClient().files().createFolder(path);
+            return getDbxClient().files().createFolderV2(path).getMetadata();
         } catch (DbxException e) {
             LOG.error("Unable to create directory {}.", dirname);
             throw new DirectoryHandleException("Unable to create directory.", e);

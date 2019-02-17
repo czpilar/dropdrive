@@ -17,7 +17,7 @@ public abstract class AbstractFileService extends AbstractService {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractFileService.class);
 
     protected String getPath(String filename, Metadata parent) {
-        Assert.notNull(filename);
+        Assert.notNull(filename, "Filename must not be null.");
 
         StringBuilder path = new StringBuilder();
         if (parent != null) {

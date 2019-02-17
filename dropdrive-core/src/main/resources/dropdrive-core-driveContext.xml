@@ -21,7 +21,7 @@
         <constructor-arg name="accessToken" value="#{dropDriveCoreCredentialLoader.credential.accessToken}" />
     </bean>
 
-    <bean id="dropdrive-core-dbxWebAuthNoRedirect" class="com.dropbox.core.DbxWebAuthNoRedirect">
+    <bean id="dropdrive-core-dbxWebAuth" class="com.dropbox.core.DbxWebAuth">
         <constructor-arg name="requestConfig" ref="dropdrive-core-dbxRequestConfig" />
         <constructor-arg name="appInfo" ref="dropdrive-core-dbxAppInfo" />
     </bean>

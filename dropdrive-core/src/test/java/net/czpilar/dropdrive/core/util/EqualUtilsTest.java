@@ -84,7 +84,7 @@ public class EqualUtilsTest {
     @Test
     public void testEqualsWhereFileAndPathIsNotEqualWhereLengthIsEqualAndRemoteLastModifiedIsLower() {
         Path path = Paths.get(testFile.getPath());
-        FileMetadata file = new FileMetadata("icon", "/path", "/path", "id", new Date(path.toFile().lastModified() - 1000),
+        FileMetadata file = new FileMetadata("icon", "id", new Date(path.toFile().lastModified() - 1000),
                 new Date(path.toFile().lastModified() - 1000), "123456789ab", path.toFile().length());
 
         boolean result = EqualUtils.equals(file, path);
@@ -95,7 +95,7 @@ public class EqualUtilsTest {
     @Test
     public void testEqualsWhereFileAndPathIsNotEqualWhereLengthIsNotEqual() {
         Path path = Paths.get(testFile.getPath());
-        FileMetadata file = new FileMetadata("icon", "/path", "/path", "id", new Date(path.toFile().lastModified()),
+        FileMetadata file = new FileMetadata("icon", "id", new Date(path.toFile().lastModified()),
                 new Date(path.toFile().lastModified()), "123456789ab", path.toFile().length() + 1);
 
         boolean result = EqualUtils.equals(file, path);
@@ -106,7 +106,7 @@ public class EqualUtilsTest {
     @Test
     public void testEqualsWhereFileAndPathIsEqualWhereLengthIsEqualAndLastModifiedIsEqual() {
         Path path = Paths.get(testFile.getPath());
-        FileMetadata file = new FileMetadata("icon", "/path", "/path", "id", new Date(path.toFile().lastModified()),
+        FileMetadata file = new FileMetadata("icon", "id", new Date(path.toFile().lastModified()),
                 new Date(path.toFile().lastModified()), "123456789ab", path.toFile().length());
 
         boolean result = EqualUtils.equals(file, path);
@@ -117,7 +117,7 @@ public class EqualUtilsTest {
     @Test
     public void testEqualsWhereFileAndPathIsEqualWhereLengthIsEqualAndRemoteLastModifiedIsGreater() {
         Path path = Paths.get(testFile.getPath());
-        FileMetadata file = new FileMetadata("icon", "/path", "/path", "id", new Date(path.toFile().lastModified() + 1000),
+        FileMetadata file = new FileMetadata("icon", "id", new Date(path.toFile().lastModified() + 1000),
                 new Date(path.toFile().lastModified() + 1000), "123456789ab", path.toFile().length());
 
         boolean result = EqualUtils.equals(file, path);

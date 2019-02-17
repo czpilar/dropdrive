@@ -18,25 +18,16 @@ import java.util.Properties;
  */
 public class PropertiesDropDriveCredential extends AbstractDropDriveCredential {
 
-    private String uploadDirPropertyKey;
-    private String accessTokenPropertyKey;
-    private String defaultUploadDir;
+    private final String uploadDirPropertyKey;
+    private final String accessTokenPropertyKey;
+    private final String defaultUploadDir;
 
     private String propertyFile;
     private Properties properties;
 
-    @Required
-    public void setUploadDirPropertyKey(String uploadDirPropertyKey) {
+    public PropertiesDropDriveCredential(String uploadDirPropertyKey, String accessTokenPropertyKey, String defaultUploadDir) {
         this.uploadDirPropertyKey = uploadDirPropertyKey;
-    }
-
-    @Required
-    public void setAccessTokenPropertyKey(String accessTokenPropertyKey) {
         this.accessTokenPropertyKey = accessTokenPropertyKey;
-    }
-
-    @Required
-    public void setDefaultUploadDir(String defaultUploadDir) {
         this.defaultUploadDir = defaultUploadDir;
     }
 

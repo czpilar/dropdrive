@@ -57,7 +57,7 @@
         <version.commons-codec>1.12</version.commons-codec>
         <version.commons-io>2.6</version.commons-io>
         <version.commons-lang>2.6</version.commons-lang>
-        <version.dropbox.sdk>2.0.1</version.dropbox.sdk>
+        <version.dropbox.sdk>3.0.11</version.dropbox.sdk>
         <version.logback>1.2.3</version.logback>
         <version.mockito>1.10.19</version.mockito>
         <version.powermock>1.7.4</version.powermock>

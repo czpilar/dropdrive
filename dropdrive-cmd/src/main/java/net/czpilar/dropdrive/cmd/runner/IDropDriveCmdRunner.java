@@ -8,7 +8,7 @@ package net.czpilar.dropdrive.cmd.runner;
 public interface IDropDriveCmdRunner {
 
     /**
-     * Runs comman line dropDrive.
+     * Runs command line dropDrive.
      *
      * @param args
      */

@@ -52,10 +52,7 @@ public class PropertiesDropDriveCredentialTest {
     }
 
     private PropertiesDropDriveCredential createDropDriveCredential(String propertyFile) {
-        PropertiesDropDriveCredential dropDriveCredential = new PropertiesDropDriveCredential();
-        dropDriveCredential.setUploadDirPropertyKey(UPLOAD_DIR_PROPERTY_KEY);
-        dropDriveCredential.setAccessTokenPropertyKey(ACCESS_TOKEN_PROPERTY_KEY);
-        dropDriveCredential.setDefaultUploadDir(DEFAULT_UPLOAD_DIR);
+        PropertiesDropDriveCredential dropDriveCredential = new PropertiesDropDriveCredential(UPLOAD_DIR_PROPERTY_KEY, ACCESS_TOKEN_PROPERTY_KEY, DEFAULT_UPLOAD_DIR);
         dropDriveCredential.setPropertyFile(propertyFile);
         return dropDriveCredential;
     }

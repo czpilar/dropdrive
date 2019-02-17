@@ -86,7 +86,7 @@ public class AbstractFileServiceTest {
 
     @Test
     public void testGetPathWithFilenameAndExistingParent() {
-        FolderMetadata parent = new FolderMetadata("icon", "/path/to/parent", "/path/to/parent", "id");
+        FolderMetadata parent = new FolderMetadata("icon", "id", "/path/to/parent", "/path/to/parent", null, null, null, null);
 
         when(service.getPath(anyString(), any(Metadata.class))).thenCallRealMethod();
 

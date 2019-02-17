@@ -2,7 +2,7 @@ package net.czpilar.dropdrive.core.service.impl;
 
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxWebAuthNoRedirect;
+import com.dropbox.core.DbxWebAuth;
 import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import net.czpilar.dropdrive.core.exception.AuthorizationFailedException;
@@ -23,7 +23,7 @@ public class AuthorizationServiceTest {
     private AuthorizationService service = new AuthorizationService();
 
     @Mock
-    private DbxWebAuthNoRedirect dbxWebAuth;
+    private DbxWebAuth dbxWebAuth;
     @Mock
     private IDropDriveCredential credential;
 
@@ -36,13 +36,13 @@ public class AuthorizationServiceTest {
 
     @Test
     public void testGetAuthorizationURL() {
-        when(dbxWebAuth.start()).thenReturn("authorization-request-url");
+        when(dbxWebAuth.authorize(any())).thenReturn("authorization-request-url");
 
         String result = service.getAuthorizationURL();
 
         assertEquals("authorization-request-url", result);
 
-        verify(dbxWebAuth).start();
+        verify(dbxWebAuth).authorize(any());
 
         verifyNoMoreInteractions(dbxWebAuth);
     }
@@ -52,16 +52,16 @@ public class AuthorizationServiceTest {
         String authorizationCode = "test-authorization-code";
         String accessToken = "test-access-token";
 
-        DbxAuthFinish dbxAuthFinish = new DbxAuthFinish(accessToken, "user-id", "url-state");
+        DbxAuthFinish dbxAuthFinish = new DbxAuthFinish(accessToken, "user-id", "url-state", "team-id", "url-state");
 
-        when(dbxWebAuth.finish(authorizationCode)).thenReturn(dbxAuthFinish);
+        when(dbxWebAuth.finishFromCode(authorizationCode)).thenReturn(dbxAuthFinish);
 
         Credential result = service.authorize(authorizationCode);
 
         assertNotNull(result);
         assertEquals(accessToken, result.getAccessToken());
 
-        verify(dbxWebAuth).finish(authorizationCode);
+        verify(dbxWebAuth).finishFromCode(authorizationCode);
         verify(credential).saveCredential(result);
 
         verifyNoMoreInteractions(dbxWebAuth);
@@ -72,12 +72,12 @@ public class AuthorizationServiceTest {
     public void testAuthorizeWithExceptionDuringStoringCredential() throws DbxException {
         String authorizationCode = "test-authorization-code";
 
-        when(dbxWebAuth.finish(authorizationCode)).thenThrow(DbxException.class);
+        when(dbxWebAuth.finishFromCode(authorizationCode)).thenThrow(DbxException.class);
 
         try {
             service.authorize(authorizationCode);
         } catch (AuthorizationFailedException e) {
-            verify(dbxWebAuth).finish(authorizationCode);
+            verify(dbxWebAuth).finishFromCode(authorizationCode);
 
             verifyNoMoreInteractions(dbxWebAuth);
             verifyNoMoreInteractions(credential);
