@@ -1,8 +1,5 @@
 package net.czpilar.dropdrive.cmd.runner.impl;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.dropbox.core.v2.files.FileMetadata;
 import net.czpilar.dropdrive.cmd.credential.PropertiesDropDriveCredential;
 import net.czpilar.dropdrive.cmd.exception.CommandLineException;
@@ -11,12 +8,11 @@ import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.service.IAuthorizationService;
 import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Command line runner implementation.

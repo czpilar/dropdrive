@@ -1,9 +1,9 @@
 package net.czpilar.dropdrive.core.util;
 
+import com.dropbox.core.v2.files.FileMetadata;
+
 import java.io.File;
 import java.nio.file.Path;
-
-import com.dropbox.core.v2.files.FileMetadata;
 
 /**
  * Equal utility class.

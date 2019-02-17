@@ -1,14 +1,14 @@
 package net.czpilar.dropdrive.cmd.credential;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 import net.czpilar.dropdrive.cmd.exception.PropertiesFileException;
 import net.czpilar.dropdrive.core.credential.impl.AbstractDropDriveCredential;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.Assert;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Implementation of dropDrive credential using

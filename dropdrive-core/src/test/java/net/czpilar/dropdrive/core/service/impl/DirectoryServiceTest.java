@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
  * @author David Pilar (david@czpilar.net)
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DbxClientV2.class, DbxUserFilesRequests.class })
+@PrepareForTest({DbxClientV2.class, DbxUserFilesRequests.class})
 public class DirectoryServiceTest {
 
     private DirectoryService service = new DirectoryService();

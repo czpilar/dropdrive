@@ -1,13 +1,14 @@
 package net.czpilar.dropdrive.cmd.option;
 
-import java.util.Arrays;
-
 import org.apache.commons.cli.Option;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.*;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author David Pilar (david@czpilar.net)

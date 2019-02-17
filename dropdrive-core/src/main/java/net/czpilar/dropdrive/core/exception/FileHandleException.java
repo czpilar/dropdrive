@@ -7,16 +7,7 @@ package net.czpilar.dropdrive.core.exception;
  */
 public class FileHandleException extends DropDriveException {
 
-    public FileHandleException(String message) {
-        super(message);
-    }
-
     public FileHandleException(String message, Throwable cause) {
         super(message, cause);
     }
-
-    public FileHandleException(Throwable cause) {
-        super(cause);
-    }
-
 }

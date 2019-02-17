@@ -1,15 +1,16 @@
 package net.czpilar.dropdrive.cmd.credential;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author David Pilar (david@czpilar.net)
@@ -45,7 +46,7 @@ public class PropertiesDropDriveCredentialTest {
     }
 
     @After
-    public void after() throws IOException {
+    public void after() {
         deleteIfExist(propertiesNotExist);
         deleteIfExist(propertiesExist);
     }
@@ -59,7 +60,7 @@ public class PropertiesDropDriveCredentialTest {
         return dropDriveCredential;
     }
 
-    private void deleteIfExist(File file) throws IOException {
+    private void deleteIfExist(File file) {
         if (file.exists()) {
             file.delete();
         }

@@ -1,11 +1,5 @@
 package net.czpilar.dropdrive.core.request;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.CommitInfo;
@@ -15,6 +9,12 @@ import com.dropbox.core.v2.files.WriteMode;
 import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 
 /**
  * File request implementation for uploading file using chunk file upload.

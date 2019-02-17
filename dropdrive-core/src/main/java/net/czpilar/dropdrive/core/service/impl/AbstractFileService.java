@@ -1,11 +1,7 @@
 package net.czpilar.dropdrive.core.service.impl;
 
 import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.FileMetadata;
-import com.dropbox.core.v2.files.FolderMetadata;
-import com.dropbox.core.v2.files.GetMetadataErrorException;
-import com.dropbox.core.v2.files.LookupError;
-import com.dropbox.core.v2.files.Metadata;
+import com.dropbox.core.v2.files.*;
 import net.czpilar.dropdrive.core.exception.FileHandleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DbxClientV2.class, DbxUserFilesRequests.class })
+@PrepareForTest({DbxClientV2.class, DbxUserFilesRequests.class})
 public class AbstractFileServiceTest {
 
     @Mock

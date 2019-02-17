@@ -1,9 +1,9 @@
 package net.czpilar.dropdrive.core.service;
 
-import java.util.List;
-
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
+
+import java.util.List;
 
 /**
  * File service interface.

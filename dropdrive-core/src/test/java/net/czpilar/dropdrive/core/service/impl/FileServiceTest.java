@@ -1,12 +1,5 @@
 package net.czpilar.dropdrive.core.service.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
@@ -31,6 +24,13 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.*;
  * @author David Pilar (david@czpilar.net)
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DbxClientV2.class, DbxUserFilesRequests.class, EqualUtils.class, FileRequest.class })
+@PrepareForTest({DbxClientV2.class, DbxUserFilesRequests.class, EqualUtils.class, FileRequest.class})
 public class FileServiceTest {
 
     private FileService service = new FileService(3);
@@ -241,7 +241,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFileWithStringFilenameAndFileParentWhereNothingToUpdate() throws IOException {
+    public void testUploadFileWithStringFilenameAndFileParentWhereNothingToUpdate() {
         String filename = "test-filename";
         FolderMetadata parentDir = mock(FolderMetadata.class);
         FileMetadata file = mock(FileMetadata.class);

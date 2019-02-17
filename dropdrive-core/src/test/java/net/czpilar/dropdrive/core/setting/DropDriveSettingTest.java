@@ -2,7 +2,7 @@ package net.czpilar.dropdrive.core.setting;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author David Pilar (david@czpilar.net)

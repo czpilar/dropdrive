@@ -9,15 +9,7 @@ import net.czpilar.dropdrive.core.exception.DropDriveException;
  */
 public class PropertiesFileException extends DropDriveException {
 
-    public PropertiesFileException(String message) {
-        super(message);
-    }
-
     public PropertiesFileException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public PropertiesFileException(Throwable cause) {
-        super(cause);
     }
 }

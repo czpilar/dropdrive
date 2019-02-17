@@ -1,10 +1,10 @@
 package net.czpilar.dropdrive.core.listener.impl;
 
-import java.text.NumberFormat;
-
 import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.NumberFormat;
 
 /**
  * Listener used for printing progress of uploading file.

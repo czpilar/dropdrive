@@ -1,11 +1,5 @@
 package net.czpilar.dropdrive.core.util;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Date;
-
 import com.dropbox.core.v2.files.FileMetadata;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -16,12 +10,20 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ EqualUtils.class })
+@PrepareForTest({EqualUtils.class})
 public class EqualUtilsTest {
 
     private java.io.File testFile;

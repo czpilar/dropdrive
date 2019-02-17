@@ -3,7 +3,8 @@ package net.czpilar.dropdrive.core.credential.impl;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author David Pilar (david@czpilar.net)
