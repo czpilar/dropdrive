@@ -7,7 +7,6 @@ import com.dropbox.core.v2.DbxClientV2;
 import net.czpilar.dropdrive.core.credential.loader.CredentialLoader;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 
 @Configuration
@@ -15,45 +14,25 @@ import org.springframework.context.annotation.*;
 @PropertySource("dropdrive.properties")
 public class DropDriveCoreContext {
 
-    private DbxRequestConfig dbxRequestConfig;
-
-    @Autowired
-    private DropDriveSetting dropDriveSetting;
+    private final DbxRequestConfig dbxRequestConfig;
+    private final DbxAppInfo dbxAppInfo;
 
     @Autowired
     private CredentialLoader credentialLoader;
 
-    @Value("${dropdrive.version}")
-    private String applicationVersion;
-
-    @Value("${dropdrive.core.drive.clientKey}")
-    private String clientKey;
-
-    @Value("${dropdrive.core.drive.clientSecret}")
-    private String clientSecret;
-
-
-    @Bean
-    public DbxAppInfo dbxAppInfo() {
-        return new DbxAppInfo(dropDriveSetting.getClientKey(), dropDriveSetting.getClientSecret());
-    }
-
-    @Bean
-    public DbxRequestConfig dbxRequestConfig() {
-        if (dbxRequestConfig == null) {
-            dbxRequestConfig = new DbxRequestConfig(dropDriveSetting.getApplicationName());
-        }
-        return dbxRequestConfig;
+    public DropDriveCoreContext(DropDriveSetting dropDriveSetting) {
+        dbxRequestConfig = new DbxRequestConfig(dropDriveSetting.getApplicationName());
+        dbxAppInfo = new DbxAppInfo(dropDriveSetting.getClientKey(), dropDriveSetting.getClientSecret());
     }
 
     @Bean
     @Scope("prototype")
     public DbxClientV2 dbxClient() {
-        return new DbxClientV2(dbxRequestConfig(), credentialLoader.getCredential().getAccessToken());
+        return new DbxClientV2(dbxRequestConfig, credentialLoader.getCredential().getAccessToken());
     }
 
     @Bean
     public DbxWebAuth dbxWebAuth() {
-        return new DbxWebAuth(dbxRequestConfig(), dbxAppInfo());
+        return new DbxWebAuth(dbxRequestConfig, dbxAppInfo);
     }
 }
