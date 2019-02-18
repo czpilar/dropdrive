@@ -10,6 +10,7 @@ import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
 import org.apache.commons.cli.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
  *
  * @author David Pilar (david@czpilar.net)
  */
+@Component
 public class DropDriveCmdRunner implements IDropDriveCmdRunner {
 
     public static final String OPTION_FILE = "f";

@@ -1,5 +1,6 @@
 package net.czpilar.dropdrive.cmd.credential;
 
+import net.czpilar.dropdrive.cmd.context.DropDriveCmdContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,11 +16,6 @@ import static org.junit.Assert.assertEquals;
  * @author David Pilar (david@czpilar.net)
  */
 public class PropertiesDropDriveCredentialTest {
-
-    private static final String UPLOAD_DIR_PROPERTY_KEY = "dropdrive.uploadDir";
-    private static final String ACCESS_TOKEN_PROPERTY_KEY = "dropdrive.accessToken";
-    private static final String DEFAULT_UPLOAD_DIR = "dropdrive-uploads";
-
 
     private PropertiesDropDriveCredential dropDrivePropertiesNotExist;
     private PropertiesDropDriveCredential dropDrivePropertiesExist;
@@ -37,8 +33,8 @@ public class PropertiesDropDriveCredentialTest {
         deleteIfExist(propertiesExist);
 
         properties = new Properties();
-        properties.setProperty(UPLOAD_DIR_PROPERTY_KEY, "test-upload-dir");
-        properties.setProperty(ACCESS_TOKEN_PROPERTY_KEY, "test-access-token");
+        properties.setProperty(DropDriveCmdContext.UPLOAD_DIR_PROPERTY_KEY, "test-upload-dir");
+        properties.setProperty(DropDriveCmdContext.ACCESS_TOKEN_PROPERTY_KEY, "test-access-token");
         properties.store(new FileOutputStream(propertiesExist), "properties created in test");
 
         dropDrivePropertiesNotExist = createDropDriveCredential(propertiesNotExist.getPath());
@@ -52,7 +48,8 @@ public class PropertiesDropDriveCredentialTest {
     }
 
     private PropertiesDropDriveCredential createDropDriveCredential(String propertyFile) {
-        PropertiesDropDriveCredential dropDriveCredential = new PropertiesDropDriveCredential(UPLOAD_DIR_PROPERTY_KEY, ACCESS_TOKEN_PROPERTY_KEY, DEFAULT_UPLOAD_DIR);
+        PropertiesDropDriveCredential dropDriveCredential = new PropertiesDropDriveCredential(
+                DropDriveCmdContext.UPLOAD_DIR_PROPERTY_KEY, DropDriveCmdContext.ACCESS_TOKEN_PROPERTY_KEY, DropDriveCmdContext.DEFAULT_UPLOAD_DIR);
         dropDriveCredential.setPropertyFile(propertyFile);
         return dropDriveCredential;
     }
@@ -85,7 +82,7 @@ public class PropertiesDropDriveCredentialTest {
 
     @Test
     public void testGetUploadDirWherePropertiesNotExist() {
-        assertEquals(DEFAULT_UPLOAD_DIR, dropDrivePropertiesNotExist.getUploadDir());
+        assertEquals(DropDriveCmdContext.DEFAULT_UPLOAD_DIR, dropDrivePropertiesNotExist.getUploadDir());
     }
 
     @Test

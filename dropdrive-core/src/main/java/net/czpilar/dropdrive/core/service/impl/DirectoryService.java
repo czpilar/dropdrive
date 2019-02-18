@@ -7,12 +7,14 @@ import net.czpilar.dropdrive.core.service.IDirectoryService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * Service with methods for handling directories in Dropbox.
  *
  * @author David Pilar (david@czpilar.net)
  */
+@Service
 public class DirectoryService extends AbstractFileService implements IDirectoryService {
 
     private static final String DIRECTORY_SEPARATOR = "/";
