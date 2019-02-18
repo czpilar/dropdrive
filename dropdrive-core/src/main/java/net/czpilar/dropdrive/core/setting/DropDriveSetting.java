@@ -1,26 +1,32 @@
 package net.czpilar.dropdrive.core.setting;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
  * Holder for DropDrive secrets, scopes and other info.
  *
  * @author David Pilar (david@czpilar.net)
  */
+@Component
 public class DropDriveSetting {
 
-    private final String applicationName;
+    public static final String APPLICATION_NAME = "dropdrive";
+
     private final String applicationVersion;
     private final String clientKey;
     private final String clientSecret;
 
-    public DropDriveSetting(String applicationName, String applicationVersion, String clientKey, String clientSecret) {
-        this.applicationName = applicationName;
+    public DropDriveSetting(@Value("${dropdrive.version}") String applicationVersion,
+                            @Value("${dropdrive.core.drive.clientKey}") String clientKey,
+                            @Value("${dropdrive.core.drive.clientSecret}") String clientSecret) {
         this.applicationVersion = applicationVersion;
         this.clientKey = clientKey;
         this.clientSecret = clientSecret;
     }
 
     public String getApplicationName() {
-        return applicationName;
+        return APPLICATION_NAME;
     }
 
     public String getApplicationVersion() {

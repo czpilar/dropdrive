@@ -15,11 +15,10 @@ import org.springframework.context.annotation.*;
 @PropertySource("dropdrive.properties")
 public class DropDriveCoreContext {
 
-    private static final String APPLICATION_NAME = "dropdrive";
-
-    private DropDriveSetting dropDriveSetting;
-
     private DbxRequestConfig dbxRequestConfig;
+
+    @Autowired
+    private DropDriveSetting dropDriveSetting;
 
     @Autowired
     private CredentialLoader credentialLoader;
@@ -33,23 +32,16 @@ public class DropDriveCoreContext {
     @Value("${dropdrive.core.drive.clientSecret}")
     private String clientSecret;
 
-    @Bean
-    public DropDriveSetting dropDriveSetting() {
-        if (dropDriveSetting == null) {
-            dropDriveSetting = new DropDriveSetting(APPLICATION_NAME, applicationVersion, clientKey, clientSecret);
-        }
-        return dropDriveSetting;
-    }
 
     @Bean
     public DbxAppInfo dbxAppInfo() {
-        return new DbxAppInfo(dropDriveSetting().getClientKey(), dropDriveSetting().getClientSecret());
+        return new DbxAppInfo(dropDriveSetting.getClientKey(), dropDriveSetting.getClientSecret());
     }
 
     @Bean
     public DbxRequestConfig dbxRequestConfig() {
         if (dbxRequestConfig == null) {
-            dbxRequestConfig = new DbxRequestConfig(dropDriveSetting().getApplicationName());
+            dbxRequestConfig = new DbxRequestConfig(dropDriveSetting.getApplicationName());
         }
         return dbxRequestConfig;
     }
