@@ -35,7 +35,7 @@
 
     <scm>
         <connection>scm:git:https://github.com/czpilar/dropdrive.git</connection>
-        <developerConnection>scm:git:https://github.com/czpilar/dropdrive.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com/czpilar/dropdrive.git</developerConnection>
         <url>https://github.com/czpilar/dropdrive</url>
         <tag>HEAD</tag>
     </scm>
