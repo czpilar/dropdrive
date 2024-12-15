@@ -4,7 +4,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.FolderMetadata;
 import net.czpilar.dropdrive.core.exception.DirectoryHandleException;
 import net.czpilar.dropdrive.core.service.IDirectoryService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -3,4 +3,4 @@
 DROPDRIVE_DIR=.
 DROPDRIVE_ARTIFACT=${project.artifactId}-${project.version}
 
-java -jar $DROPDRIVE_DIR/lib/$DROPDRIVE_ARTIFACT.jar "$@"
+java -jar $DROPDRIVE_DIR/lib/$DROPDRIVE_ARTIFACT-spring-boot.jar "$@"

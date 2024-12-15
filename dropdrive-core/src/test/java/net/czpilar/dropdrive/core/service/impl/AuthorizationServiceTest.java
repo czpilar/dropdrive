@@ -6,13 +6,13 @@ import com.dropbox.core.DbxWebAuth;
 import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import net.czpilar.dropdrive.core.exception.AuthorizationFailedException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -20,18 +20,25 @@ import static org.mockito.Mockito.*;
  */
 public class AuthorizationServiceTest {
 
-    private AuthorizationService service = new AuthorizationService();
+    private final AuthorizationService service = new AuthorizationService();
 
     @Mock
     private DbxWebAuth dbxWebAuth;
     @Mock
     private IDropDriveCredential credential;
 
-    @Before
+    private AutoCloseable autoCloseable;
+
+    @BeforeEach
     public void before() {
-        MockitoAnnotations.initMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
         service.setDbxWebAuth(dbxWebAuth);
         service.setDropDriveCredential(credential);
+    }
+
+    @AfterEach
+    public void after() throws Exception {
+        autoCloseable.close();
     }
 
     @Test
@@ -59,7 +66,7 @@ public class AuthorizationServiceTest {
         Credential result = service.authorize(authorizationCode);
 
         assertNotNull(result);
-        assertEquals(accessToken, result.getAccessToken());
+        assertEquals(accessToken, result.accessToken());
 
         verify(dbxWebAuth).finishFromCode(authorizationCode);
         verify(credential).saveCredential(result);
@@ -68,21 +75,17 @@ public class AuthorizationServiceTest {
         verifyNoMoreInteractions(credential);
     }
 
-    @Test(expected = AuthorizationFailedException.class)
+    @Test
     public void testAuthorizeWithExceptionDuringStoringCredential() throws DbxException {
         String authorizationCode = "test-authorization-code";
 
         when(dbxWebAuth.finishFromCode(authorizationCode)).thenThrow(DbxException.class);
 
-        try {
-            service.authorize(authorizationCode);
-        } catch (AuthorizationFailedException e) {
-            verify(dbxWebAuth).finishFromCode(authorizationCode);
+        assertThrows(AuthorizationFailedException.class, () -> service.authorize(authorizationCode));
 
-            verifyNoMoreInteractions(dbxWebAuth);
-            verifyNoMoreInteractions(credential);
+        verify(dbxWebAuth).finishFromCode(authorizationCode);
 
-            throw e;
-        }
+        verifyNoMoreInteractions(dbxWebAuth);
+        verifyNoMoreInteractions(credential);
     }
 }

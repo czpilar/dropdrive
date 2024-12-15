@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>net.czpilar.dropdrive</groupId>
@@ -7,7 +8,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.czpilar.dropdrive</groupId>
     <artifactId>dropdrive-core</artifactId>
     <packaging>jar</packaging>
     <version>1.2.6-SNAPSHOT</version>
@@ -42,8 +42,8 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -56,8 +56,8 @@
 
         <!-- Dropbox -->
         <dependency>
-          <groupId>com.dropbox.core</groupId>
-          <artifactId>dropbox-core-sdk</artifactId>
+            <groupId>com.dropbox.core</groupId>
+            <artifactId>dropbox-core-sdk</artifactId>
         </dependency>
 
         <!-- Spring -->

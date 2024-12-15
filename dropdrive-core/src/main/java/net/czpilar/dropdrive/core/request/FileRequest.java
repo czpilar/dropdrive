@@ -59,10 +59,8 @@ public class FileRequest {
 
         progress(IFileUploadProgressListener.State.INITIATION, offsetBytes);
 
-        FileInputStream stream = new FileInputStream(localFile);
-        long size = localFile.length();
-
-        try {
+        try (FileInputStream stream = new FileInputStream(localFile)) {
+            long size = localFile.length();
             String chunkId = null;
 
             while (offsetBytes < size) {
@@ -83,8 +81,6 @@ public class FileRequest {
             FileMetadata file = dbxClient.files().uploadSessionFinish(cursor, commitInfo).finish();
             progress(IFileUploadProgressListener.State.COMPLETE, offsetBytes);
             return file;
-        } finally {
-            stream.close();
         }
     }
 

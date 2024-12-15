@@ -14,8 +14,4 @@ public class DropDriveException extends RuntimeException {
     public DropDriveException(String message, Throwable cause) {
         super(message, cause);
     }
-
-    public DropDriveException(Throwable cause) {
-        super(cause);
-    }
 }

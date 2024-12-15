@@ -12,17 +12,14 @@ import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
 import net.czpilar.dropdrive.core.request.FileRequest;
 import net.czpilar.dropdrive.core.service.IDirectoryService;
 import net.czpilar.dropdrive.core.util.EqualUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
@@ -32,18 +29,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
  * @author David Pilar (david@czpilar.net)
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({DbxClientV2.class, DbxUserFilesRequests.class, EqualUtils.class, FileRequest.class})
-@PowerMockIgnore("jdk.internal.reflect.*")
 public class FileServiceTest {
 
-    private FileService service = new FileService(3);
+    private final FileService service = new FileService(3);
 
     @Mock
     private FileService serviceMock;
@@ -60,9 +54,16 @@ public class FileServiceTest {
     @Mock
     private IDropDriveCredential dropDriveCredential;
 
-    @Before
+    private AutoCloseable autoCloseable;
+
+    private MockedStatic<DbxClientV2> dbxClientV2MockedStatic;
+    private MockedStatic<DbxUserFilesRequests> dbxUserFilesRequestsMockedStatic;
+    private MockedStatic<EqualUtils> equalUtilsMockedStatic;
+    private MockedStatic<FileRequest> fileRequestMockedStatic;
+
+    @BeforeEach
     public void before() {
-        MockitoAnnotations.initMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
         service.setApplicationContext(applicationContext);
         service.setDropDriveCredential(dropDriveCredential);
         service.setDirectoryService(directoryService);
@@ -70,8 +71,19 @@ public class FileServiceTest {
         when(serviceMock.getDirectoryService()).thenReturn(directoryService);
         when(applicationContext.getBean(DbxClientV2.class)).thenReturn(dbxClient);
 
-        PowerMockito.mockStatic(EqualUtils.class);
-        PowerMockito.mockStatic(FileRequest.class);
+        dbxClientV2MockedStatic = mockStatic(DbxClientV2.class);
+        dbxUserFilesRequestsMockedStatic = mockStatic(DbxUserFilesRequests.class);
+        equalUtilsMockedStatic = mockStatic(EqualUtils.class);
+        fileRequestMockedStatic = mockStatic(FileRequest.class);
+    }
+
+    @AfterEach
+    public void after() throws Exception {
+        autoCloseable.close();
+        dbxClientV2MockedStatic.close();
+        dbxUserFilesRequestsMockedStatic.close();
+        equalUtilsMockedStatic.close();
+        fileRequestMockedStatic.close();
     }
 
     @Test
@@ -91,7 +103,7 @@ public class FileServiceTest {
         assertNotNull(result);
         assertEquals(uploadDirName, result);
 
-        verifyZeroInteractions(dropDriveCredential);
+        verifyNoInteractions(dropDriveCredential);
     }
 
     @Test
@@ -113,26 +125,25 @@ public class FileServiceTest {
     @Test
     public void testUploadFileWithStringFilenameAndNullParent() throws IOException, DbxException {
         String filename = "test-filename";
-        FolderMetadata parentDir = null;
         FileMetadata file = mock(FileMetadata.class);
         FileRequest insert = mock(FileRequest.class);
 
-        when(serviceMock.getPath(anyString(), any(Metadata.class))).thenReturn(filename);
-        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any())).thenReturn(filename);
+        when(serviceMock.uploadFile(anyString(), (FolderMetadata) any())).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(null);
-        when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
+        when(serviceMock.findFile(anyString(), any())).thenReturn(null);
+        when(FileRequest.createInsert(any(), anyString(), any())).thenReturn(insert);
         when(insert.execute()).thenReturn(file);
 
-        FileMetadata result = serviceMock.uploadFile(filename, parentDir);
+        FileMetadata result = serviceMock.uploadFile(filename, (FolderMetadata) null);
 
         assertNotNull(result);
         assertEquals(file, result);
 
-        verify(serviceMock).getPath(filename, parentDir);
-        verify(serviceMock).uploadFile(filename, parentDir);
+        verify(serviceMock).getPath(filename, null);
+        verify(serviceMock).uploadFile(filename, (FolderMetadata) null);
         verify(serviceMock).getDbxClient();
-        verify(serviceMock).findFile(filename, parentDir);
+        verify(serviceMock).findFile(filename, null);
         verify(insert).execute();
         verify(insert).setProgressListener(any(IFileUploadProgressListener.class));
         verify(file).getRev();
@@ -177,36 +188,31 @@ public class FileServiceTest {
         verifyNoMoreInteractions(parentDir);
     }
 
-    @Test(expected = FileHandleException.class)
+    @Test
     public void testUploadFileWithStringFilenameAndNullParentAndThrownException() throws IOException, DbxException {
         String filename = "test-filename";
-        FolderMetadata parentDir = null;
         FileRequest insert = mock(FileRequest.class);
 
-        when(serviceMock.getPath(anyString(), any(Metadata.class))).thenReturn(filename);
-        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any())).thenReturn(filename);
+        when(serviceMock.uploadFile(anyString(), (FolderMetadata) any())).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(null);
+        when(serviceMock.findFile(anyString(), any())).thenReturn(null);
         when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
         when(insert.execute()).thenThrow(DbxException.class);
 
-        try {
-            serviceMock.uploadFile(filename, parentDir);
-        } catch (FileHandleException e) {
-            verify(serviceMock).getPath(filename, parentDir);
-            verify(serviceMock).uploadFile(filename, parentDir);
-            verify(serviceMock).getDbxClient();
-            verify(serviceMock).findFile(filename, parentDir);
-            verify(serviceMock).getRetries();
-            verify(insert).execute();
-            verify(insert).setProgressListener(any(IFileUploadProgressListener.class));
+        assertThrows(FileHandleException.class, () -> serviceMock.uploadFile(filename, (FolderMetadata) null));
 
-            verifyNoMoreInteractions(serviceMock);
-            verifyNoMoreInteractions(dbxClient);
-            verifyNoMoreInteractions(insert);
+        verify(serviceMock).getPath(filename, null);
+        verify(serviceMock).uploadFile(filename, (FolderMetadata) null);
+        verify(serviceMock).getDbxClient();
+        verify(serviceMock).findFile(filename, null);
+        verify(serviceMock).getRetries();
+        verify(insert).execute();
+        verify(insert).setProgressListener(any(IFileUploadProgressListener.class));
 
-            throw e;
-        }
+        verifyNoMoreInteractions(serviceMock);
+        verifyNoMoreInteractions(dbxClient);
+        verifyNoMoreInteractions(insert);
     }
 
     @Test
@@ -246,11 +252,12 @@ public class FileServiceTest {
     public void testUploadFileWithStringFilenameAndFileParentWhereNothingToUpdate() {
         String filename = "test-filename";
         FolderMetadata parentDir = mock(FolderMetadata.class);
+
         FileMetadata file = mock(FileMetadata.class);
 
-        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
-        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(file);
-        when(EqualUtils.notEquals(any(FileMetadata.class), any(Path.class))).thenReturn(false);
+        when(serviceMock.uploadFile(anyString(), (FolderMetadata) any())).thenCallRealMethod();
+        when(serviceMock.findFile(anyString(), any())).thenReturn(file);
+        when(EqualUtils.notEquals(any(), any())).thenReturn(false);
 
         FileMetadata result = serviceMock.uploadFile(filename, parentDir);
 
@@ -273,14 +280,14 @@ public class FileServiceTest {
         final FileMetadata file = mock(FileMetadata.class);
         FileRequest insert = mock(FileRequest.class);
 
-        when(serviceMock.getPath(anyString(), any(Metadata.class))).thenReturn(filename);
-        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.getPath(anyString(), any())).thenReturn(filename);
+        when(serviceMock.uploadFile(anyString(), (FolderMetadata) any())).thenCallRealMethod();
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
-        when(serviceMock.findFile(anyString(), any(FolderMetadata.class))).thenReturn(null);
+        when(serviceMock.findFile(anyString(), any())).thenReturn(null);
         when(serviceMock.getRetries()).thenReturn(3);
-        when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
+        when(FileRequest.createInsert(any(), anyString(), any())).thenReturn(insert);
 
-        Answer<FileMetadata> answer = new Answer<FileMetadata>() {
+        Answer<FileMetadata> answer = new Answer<>() {
             private int retry = 0;
 
             @Override
@@ -315,7 +322,7 @@ public class FileServiceTest {
         verifyNoMoreInteractions(parentDir);
     }
 
-    @Test(expected = FileHandleException.class)
+    @Test
     public void testUploadFileWithStringFilenameAndFileParentAndRetryExceeded() throws IOException, DbxException {
         String filename = "test-filename";
         FolderMetadata parentDir = mock(FolderMetadata.class);
@@ -330,28 +337,23 @@ public class FileServiceTest {
         when(FileRequest.createInsert(any(DbxClientV2.class), anyString(), any(File.class))).thenReturn(insert);
         when(insert.execute()).thenThrow(DbxException.class);
 
-        try {
-            serviceMock.uploadFile(filename, parentDir);
-        } catch (FileHandleException e) {
+        FileHandleException e = assertThrows(FileHandleException.class, () -> serviceMock.uploadFile(filename, parentDir));
 
-            assertTrue(e.getCause() instanceof DbxException);
+        assertInstanceOf(DbxException.class, e.getCause());
 
-            verify(serviceMock).getPath(filename, parentDir);
-            verify(serviceMock).uploadFile(filename, parentDir);
-            verify(serviceMock).getDbxClient();
-            verify(serviceMock).findFile(filename, parentDir);
-            verify(serviceMock, times(4)).getRetries();
-            verify(insert, times(4)).execute();
-            verify(insert).setProgressListener(any(IFileUploadProgressListener.class));
+        verify(serviceMock).getPath(filename, parentDir);
+        verify(serviceMock).uploadFile(filename, parentDir);
+        verify(serviceMock).getDbxClient();
+        verify(serviceMock).findFile(filename, parentDir);
+        verify(serviceMock, times(4)).getRetries();
+        verify(insert, times(4)).execute();
+        verify(insert).setProgressListener(any(IFileUploadProgressListener.class));
 
-            verifyNoMoreInteractions(serviceMock);
-            verifyNoMoreInteractions(dbxClient);
-            verifyNoMoreInteractions(insert);
-            verifyNoMoreInteractions(file);
-            verifyNoMoreInteractions(parentDir);
-
-            throw e;
-        }
+        verifyNoMoreInteractions(serviceMock);
+        verifyNoMoreInteractions(dbxClient);
+        verifyNoMoreInteractions(insert);
+        verifyNoMoreInteractions(file);
+        verifyNoMoreInteractions(parentDir);
     }
 
     @Test
@@ -378,7 +380,7 @@ public class FileServiceTest {
     public void testUploadFilesWhereUploadFileThrowsException() {
         FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(serviceMock.uploadFiles(anyListOf(String.class), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.uploadFiles(anyList(), any(FolderMetadata.class))).thenCallRealMethod();
         when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenThrow(FileHandleException.class);
 
         List<FileMetadata> result = serviceMock.uploadFiles(Arrays.asList("filename1", "filename2"), parent);
@@ -386,7 +388,7 @@ public class FileServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
 
-        verify(serviceMock).uploadFiles(anyListOf(String.class), any(FolderMetadata.class));
+        verify(serviceMock).uploadFiles(anyList(), any(FolderMetadata.class));
         verify(serviceMock).uploadFile("filename1", parent);
         verify(serviceMock).uploadFile("filename2", parent);
 
@@ -397,7 +399,7 @@ public class FileServiceTest {
     public void testUploadFilesWithListOfFilenames() {
         FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(serviceMock.uploadFiles(anyListOf(String.class), any(FolderMetadata.class))).thenCallRealMethod();
+        when(serviceMock.uploadFiles(anyList(), any(FolderMetadata.class))).thenCallRealMethod();
         FileMetadata file1 = mock(FileMetadata.class);
         FileMetadata file2 = mock(FileMetadata.class);
         when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenReturn(file1, file2);
@@ -409,7 +411,7 @@ public class FileServiceTest {
         assertEquals(file1, result.get(0));
         assertEquals(file2, result.get(1));
 
-        verify(serviceMock).uploadFiles(anyListOf(String.class), any(FolderMetadata.class));
+        verify(serviceMock).uploadFiles(anyList(), any(FolderMetadata.class));
         verify(serviceMock).uploadFile("filename1", parent);
         verify(serviceMock).uploadFile("filename2", parent);
 
@@ -441,8 +443,8 @@ public class FileServiceTest {
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(directoryService);
-        verifyZeroInteractions(file);
-        verifyZeroInteractions(parent);
+        verifyNoInteractions(file);
+        verifyNoInteractions(parent);
     }
 
     @Test
@@ -451,7 +453,7 @@ public class FileServiceTest {
         FileMetadata file = mock(FileMetadata.class);
 
         when(serviceMock.uploadFile(anyString())).thenCallRealMethod();
-        when(serviceMock.uploadFile(anyString(), any(FolderMetadata.class))).thenReturn(file);
+        when(serviceMock.uploadFile(anyString(), (FolderMetadata) any())).thenReturn(file);
 
         FileMetadata result = serviceMock.uploadFile(filename);
 
@@ -462,7 +464,7 @@ public class FileServiceTest {
         verify(serviceMock).uploadFile(filename, (FolderMetadata) null);
 
         verifyNoMoreInteractions(serviceMock);
-        verifyZeroInteractions(file);
+        verifyNoInteractions(file);
     }
 
     @Test
@@ -472,8 +474,8 @@ public class FileServiceTest {
         FileMetadata file2 = mock(FileMetadata.class);
         List<FileMetadata> files = Arrays.asList(file1, file2);
 
-        when(serviceMock.uploadFiles(anyListOf(String.class))).thenCallRealMethod();
-        when(serviceMock.uploadFiles(anyListOf(String.class), any(FolderMetadata.class))).thenReturn(files);
+        when(serviceMock.uploadFiles(anyList())).thenCallRealMethod();
+        when(serviceMock.uploadFiles(anyList(), (FolderMetadata) any())).thenReturn(files);
 
         List<FileMetadata> result = serviceMock.uploadFiles(filenames);
 
@@ -485,8 +487,8 @@ public class FileServiceTest {
         verify(serviceMock).uploadFiles(filenames, (FolderMetadata) null);
 
         verifyNoMoreInteractions(serviceMock);
-        verifyZeroInteractions(file1);
-        verifyZeroInteractions(file2);
+        verifyNoInteractions(file1);
+        verifyNoInteractions(file2);
     }
 
     @Test
@@ -498,8 +500,8 @@ public class FileServiceTest {
         List<FileMetadata> files = Arrays.asList(file1, file2);
         FolderMetadata parent = mock(FolderMetadata.class);
 
-        when(serviceMock.uploadFiles(anyListOf(String.class), anyString())).thenCallRealMethod();
-        when(serviceMock.uploadFiles(anyListOf(String.class), any(FolderMetadata.class))).thenReturn(files);
+        when(serviceMock.uploadFiles(anyList(), anyString())).thenCallRealMethod();
+        when(serviceMock.uploadFiles(anyList(), any(FolderMetadata.class))).thenReturn(files);
         when(serviceMock.getUploadDir(anyString())).thenReturn(parentDir);
         when(directoryService.findOrCreateDirectory(anyString())).thenReturn(parent);
 
@@ -517,9 +519,9 @@ public class FileServiceTest {
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(directoryService);
-        verifyZeroInteractions(file1);
-        verifyZeroInteractions(file2);
-        verifyZeroInteractions(parent);
+        verifyNoInteractions(file1);
+        verifyNoInteractions(file2);
+        verifyNoInteractions(parent);
     }
 
 }

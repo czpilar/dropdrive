@@ -1,16 +1,16 @@
 package net.czpilar.dropdrive.cmd.credential;
 
 import net.czpilar.dropdrive.cmd.context.DropDriveCmdContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author David Pilar (david@czpilar.net)
@@ -24,7 +24,7 @@ public class PropertiesDropDriveCredentialTest {
     private File propertiesExist;
     private Properties properties;
 
-    @Before
+    @BeforeEach
     public void before() throws IOException {
         String tempDir = System.getProperty("java.io.tmpdir");
         propertiesNotExist = new File(tempDir + "test-properties-not-exist-file-" + System.currentTimeMillis() + ".properties");
@@ -41,7 +41,7 @@ public class PropertiesDropDriveCredentialTest {
         dropDrivePropertiesExist = createDropDriveCredential(propertiesExist.getPath());
     }
 
-    @After
+    @AfterEach
     public void after() {
         deleteIfExist(propertiesNotExist);
         deleteIfExist(propertiesExist);

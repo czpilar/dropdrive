@@ -10,21 +10,21 @@ public interface IDropDriveCredential {
     /**
      * Returns credential.
      *
-     * @return
+     * @return credential
      */
     Credential getCredential();
 
     /**
      * Saves credential.
      *
-     * @param credential
+     * @param credential credential
      */
     void saveCredential(Credential credential);
 
     /**
      * Returns upload dir.
      *
-     * @return
+     * @return upload dir
      */
     String getUploadDir();
 

@@ -1,7 +1,7 @@
 package net.czpilar.dropdrive.core.listener.impl;
 
 import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author David Pilar (david@czpilar.net)

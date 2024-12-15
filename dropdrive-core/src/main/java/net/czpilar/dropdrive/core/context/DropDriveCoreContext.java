@@ -11,7 +11,7 @@ import org.springframework.context.annotation.*;
 
 @Configuration
 @ComponentScan(basePackages = "net.czpilar.dropdrive.core")
-@PropertySource("dropdrive.properties")
+@PropertySource("classpath:dropdrive.properties")
 public class DropDriveCoreContext {
 
     private final DbxRequestConfig dbxRequestConfig;
@@ -28,7 +28,7 @@ public class DropDriveCoreContext {
     @Bean
     @Scope("prototype")
     public DbxClientV2 dbxClient() {
-        return new DbxClientV2(dbxRequestConfig, credentialLoader.getCredential().getAccessToken());
+        return new DbxClientV2(dbxRequestConfig, credentialLoader.getCredential().accessToken());
     }
 
     @Bean

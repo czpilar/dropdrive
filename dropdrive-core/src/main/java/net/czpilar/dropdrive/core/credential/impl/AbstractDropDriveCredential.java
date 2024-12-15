@@ -14,14 +14,14 @@ public abstract class AbstractDropDriveCredential implements IDropDriveCredentia
     /**
      * Returns access token.
      *
-     * @return
+     * @return access token
      */
     protected abstract String getAccessToken();
 
     /**
      * Saves access token.
      *
-     * @param accessToken
+     * @param accessToken access token
      */
     protected abstract void saveTokens(String accessToken);
 
@@ -32,6 +32,6 @@ public abstract class AbstractDropDriveCredential implements IDropDriveCredentia
 
     @Override
     public void saveCredential(Credential credential) {
-        saveTokens(credential.getAccessToken());
+        saveTokens(credential.accessToken());
     }
 }

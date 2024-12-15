@@ -26,15 +26,10 @@ public class FileUploadProgressListener implements IFileUploadProgressListener {
     @Override
     public void progressChanged(State state, long uploaded) {
         switch (state) {
-            case INITIATION:
-                LOG.info("Initiation uploading file {}", filename);
-                break;
-            case IN_PROGRESS:
-                LOG.info("Uploaded {} of file {}", NumberFormat.getPercentInstance().format(getProgress(uploaded)), filename);
-                break;
-            case COMPLETE:
-                LOG.info("Finished uploading file {}", filename);
-                break;
+            case INITIATION -> LOG.info("Initiation uploading file {}", filename);
+            case IN_PROGRESS ->
+                    LOG.info("Uploaded {} of file {}", NumberFormat.getPercentInstance().format(getProgress(uploaded)), filename);
+            case COMPLETE -> LOG.info("Finished uploading file {}", filename);
         }
     }
 

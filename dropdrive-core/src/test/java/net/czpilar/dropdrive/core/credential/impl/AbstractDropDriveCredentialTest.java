@@ -1,13 +1,14 @@
 package net.czpilar.dropdrive.core.credential.impl;
 
 import net.czpilar.dropdrive.core.credential.Credential;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -18,9 +19,16 @@ public class AbstractDropDriveCredentialTest {
     @Mock
     private AbstractDropDriveCredential dropDriveCredential;
 
-    @Before
+    private AutoCloseable autoCloseable;
+
+    @BeforeEach
     public void before() {
-        MockitoAnnotations.initMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    public void after() throws Exception {
+        autoCloseable.close();
     }
 
     @Test
@@ -32,7 +40,7 @@ public class AbstractDropDriveCredentialTest {
         Credential result = dropDriveCredential.getCredential();
 
         assertNotNull(result);
-        assertEquals(accessToken, result.getAccessToken());
+        assertEquals(accessToken, result.accessToken());
 
         verify(dropDriveCredential).getCredential();
         verify(dropDriveCredential).getAccessToken();

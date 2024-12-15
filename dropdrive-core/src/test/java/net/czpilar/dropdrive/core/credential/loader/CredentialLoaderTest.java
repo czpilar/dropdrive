@@ -3,13 +3,13 @@ package net.czpilar.dropdrive.core.credential.loader;
 import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import net.czpilar.dropdrive.core.exception.NoCredentialFoundException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -25,17 +25,22 @@ public class CredentialLoaderTest {
     @Mock
     private Credential credential;
 
-    @Before
+    private AutoCloseable autoCloseable;
+
+    @BeforeEach
     public void before() {
-        MockitoAnnotations.initMocks(this);
-        loader = new CredentialLoader();
-        loader.setDropDriveCredential(dropDriveCredential);
+        autoCloseable = MockitoAnnotations.openMocks(this);
+        loader = new CredentialLoader(dropDriveCredential);
     }
 
-    @Test(expected = NoCredentialFoundException.class)
+    @AfterEach
+    public void after() throws Exception {
+        autoCloseable.close();
+    }
+
+    @Test
     public void testGetCredentialWhereNoCredentialLoaded() {
-        loader.setDropDriveCredential(null);
-        loader.getCredential();
+        assertThrows(NoCredentialFoundException.class, () -> new CredentialLoader(null));
     }
 
     @Test
@@ -50,6 +55,6 @@ public class CredentialLoaderTest {
         verify(dropDriveCredential).getCredential();
 
         verifyNoMoreInteractions(dropDriveCredential);
-        verifyZeroInteractions(credential);
+        verifyNoInteractions(credential);
     }
 }

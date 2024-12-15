@@ -2,25 +2,19 @@ package net.czpilar.dropdrive.core.service.impl;
 
 import com.dropbox.core.v2.DbxClientV2;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
  * @author David Pilar (david@czpilar.net)
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({DbxClientV2.class})
-@PowerMockIgnore("jdk.internal.reflect.*")
 public class AbstractServiceTest {
 
     private AbstractService service;
@@ -34,14 +28,21 @@ public class AbstractServiceTest {
     @Mock
     private DbxClientV2 dbxClient;
 
-    @Before
+    private AutoCloseable autoCloseable;
+
+    @BeforeEach
     public void before() {
-        MockitoAnnotations.initMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
         service = new AbstractService() {
         };
         service.setApplicationContext(applicationContext);
 
         when(applicationContext.getBean(DbxClientV2.class)).thenReturn(dbxClient);
+    }
+
+    @AfterEach
+    public void after() throws Exception {
+        autoCloseable.close();
     }
 
     @Test

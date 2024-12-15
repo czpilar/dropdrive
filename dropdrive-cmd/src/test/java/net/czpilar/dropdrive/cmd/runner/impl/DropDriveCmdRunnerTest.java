@@ -7,15 +7,15 @@ import net.czpilar.dropdrive.core.service.IAuthorizationService;
 import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
 import org.apache.commons.cli.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
  */
 public class DropDriveCmdRunnerTest {
 
-    private DropDriveCmdRunner runner = new DropDriveCmdRunner();
+    private final DropDriveCmdRunner runner = new DropDriveCmdRunner();
     @Mock
     private CommandLineParser commandLineParser;
     @Mock
@@ -41,9 +41,11 @@ public class DropDriveCmdRunnerTest {
     @Mock
     private CommandLine commandLine;
 
-    @Before
+    private AutoCloseable autoCloseable;
+
+    @BeforeEach
     public void before() {
-        MockitoAnnotations.initMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
         runner.setCommandLineParser(commandLineParser);
         runner.setOptions(options);
         runner.setHelpFormatter(helpFormatter);
@@ -51,6 +53,11 @@ public class DropDriveCmdRunnerTest {
         runner.setFileService(fileService);
         runner.setDropDriveSetting(dropDriveSetting);
         runner.setPropertiesDropDriveCredential(propertiesDropDriveCredential);
+    }
+
+    @AfterEach
+    public void after() throws Exception {
+        autoCloseable.close();
     }
 
     @Test
@@ -70,11 +77,11 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(helpFormatter);
         verifyNoMoreInteractions(dropDriveSetting);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
-        verifyZeroInteractions(propertiesDropDriveCredential);
-        verifyZeroInteractions(commandLine);
+        verifyNoInteractions(options);
+        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(fileService);
+        verifyNoInteractions(propertiesDropDriveCredential);
+        verifyNoInteractions(commandLine);
     }
 
     @Test
@@ -98,10 +105,10 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(dropDriveSetting);
         verifyNoMoreInteractions(commandLine);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
-        verifyZeroInteractions(propertiesDropDriveCredential);
+        verifyNoInteractions(options);
+        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(fileService);
+        verifyNoInteractions(propertiesDropDriveCredential);
     }
 
     @Test
@@ -127,10 +134,10 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(dropDriveSetting);
         verifyNoMoreInteractions(commandLine);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
-        verifyZeroInteractions(propertiesDropDriveCredential);
+        verifyNoInteractions(options);
+        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(fileService);
+        verifyNoInteractions(propertiesDropDriveCredential);
     }
 
     @Test
@@ -170,9 +177,9 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(commandLine);
         verifyNoMoreInteractions(propertiesDropDriveCredential);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
+        verifyNoInteractions(options);
+        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(fileService);
     }
 
     @Test
@@ -213,9 +220,9 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(commandLine);
         verifyNoMoreInteractions(propertiesDropDriveCredential);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
+        verifyNoInteractions(options);
+        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(fileService);
     }
 
     @Test
@@ -253,10 +260,10 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(dropDriveSetting);
         verifyNoMoreInteractions(commandLine);
         verifyNoMoreInteractions(propertiesDropDriveCredential);
+        verifyNoMoreInteractions(authorizationService);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
+        verifyNoInteractions(options);
+        verifyNoInteractions(fileService);
     }
 
     @Test
@@ -297,10 +304,10 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(dropDriveSetting);
         verifyNoMoreInteractions(commandLine);
         verifyNoMoreInteractions(propertiesDropDriveCredential);
+        verifyNoMoreInteractions(authorizationService);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
+        verifyNoInteractions(options);
+        verifyNoInteractions(fileService);
     }
 
     @Test
@@ -341,17 +348,17 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(dropDriveSetting);
         verifyNoMoreInteractions(commandLine);
         verifyNoMoreInteractions(propertiesDropDriveCredential);
+        verifyNoMoreInteractions(authorizationService);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
+        verifyNoInteractions(options);
+        verifyNoInteractions(fileService);
     }
 
     @Test
     public void testRunWhereCommandLineHasPropertiesAndFileOptionsAndNoDirectory() throws ParseException {
         String propertiesValue = "test-properties-value";
         String optionFile = "test-file-value";
-        List<String> optionFiles = Arrays.asList(optionFile);
+        List<String> optionFiles = List.of(optionFile);
         String[] args = {"arg1", "arg2"};
         Option[] optionList = {mock(Option.class), mock(Option.class)};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
@@ -387,11 +394,11 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(dropDriveSetting);
         verifyNoMoreInteractions(commandLine);
         verifyNoMoreInteractions(propertiesDropDriveCredential);
+        verifyNoMoreInteractions(fileService);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
-        verifyZeroInteractions(authorizationService);
+        verifyNoInteractions(options);
+        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(authorizationService);
     }
 
     @Test
@@ -399,7 +406,7 @@ public class DropDriveCmdRunnerTest {
         String propertiesValue = "test-properties-value";
         String optionFile = "test-file-value";
         String optionDirectory = "test-directory";
-        List<String> optionFiles = Arrays.asList(optionFile);
+        List<String> optionFiles = List.of(optionFile);
         String[] args = {"arg1", "arg2"};
         Option[] optionList = {mock(Option.class), mock(Option.class)};
         FileMetadata file1 = mock(FileMetadata.class);
@@ -417,7 +424,7 @@ public class DropDriveCmdRunnerTest {
         when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(propertiesValue);
         when(commandLine.getOptionValues(DropDriveCmdRunner.OPTION_FILE)).thenReturn(new String[]{optionFile});
         when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_DIRECTORY)).thenReturn(optionDirectory);
-        when(fileService.uploadFiles(anyListOf(String.class), anyString())).thenReturn(files);
+        when(fileService.uploadFiles(anyList(), anyString())).thenReturn(files);
 
         runner.run(args);
 
@@ -445,12 +452,12 @@ public class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(dropDriveSetting);
         verifyNoMoreInteractions(commandLine);
         verifyNoMoreInteractions(propertiesDropDriveCredential);
+        verifyNoMoreInteractions(fileService);
         verifyNoMoreInteractions(file1, file2);
 
-        verifyZeroInteractions(options);
-        verifyZeroInteractions(authorizationService);
-        verifyZeroInteractions(fileService);
-        verifyZeroInteractions(authorizationService);
+        verifyNoInteractions(options);
+        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(authorizationService);
     }
 
 }
