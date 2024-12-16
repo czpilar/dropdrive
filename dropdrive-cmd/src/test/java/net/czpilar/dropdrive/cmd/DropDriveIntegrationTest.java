@@ -53,9 +53,9 @@ public class DropDriveIntegrationTest {
 
     @Test
     public void testUploadFiles() throws IOException {
-        String filename1 = "test1.txt";
-        String filename2 = "test2.txt";
-        String filename3 = "test3.txt";
+        String filename1 = "target/test1.txt";
+        String filename2 = "target/test2.txt";
+        String filename3 = "target/test3.txt";
         createFileIfNotExist(filename1);
         createFileIfNotExist(filename2);
         createFileIfNotExist(filename3);
@@ -64,7 +64,7 @@ public class DropDriveIntegrationTest {
 
     @Test
     public void testUploadFileToSubdirectory() throws IOException {
-        String filename = "test1.txt";
+        String filename = "target/test1.txt";
         createFileIfNotExist(filename);
         DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup/dropdrive-subdir/dropdrive-lastdir", "-p", PROPERTIES});
     }

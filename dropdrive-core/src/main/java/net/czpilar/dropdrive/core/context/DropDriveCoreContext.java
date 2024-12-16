@@ -16,9 +16,12 @@ public class DropDriveCoreContext {
 
     private final DbxRequestConfig dbxRequestConfig;
     private final DbxAppInfo dbxAppInfo;
+    private CredentialLoader credentialLoader;
 
     @Autowired
-    private CredentialLoader credentialLoader;
+    public void setCredentialLoader(CredentialLoader credentialLoader) {
+        this.credentialLoader = credentialLoader;
+    }
 
     public DropDriveCoreContext(DropDriveSetting dropDriveSetting) {
         dbxRequestConfig = new DbxRequestConfig(dropDriveSetting.getApplicationName());

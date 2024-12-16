@@ -1,7 +1,8 @@
 package net.czpilar.dropdrive.cmd;
 
+import net.czpilar.dropdrive.cmd.context.DropDriveCmdContext;
 import net.czpilar.dropdrive.cmd.runner.IDropDriveCmdRunner;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * Main class for running dropDrive from command line.
@@ -11,8 +12,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class DropDrive {
 
     public static void main(String[] args) {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:dropdrive-cmd-applicationContext.xml");
-        IDropDriveCmdRunner runner = context.getBean(IDropDriveCmdRunner.class);
-        runner.run(args);
+        new AnnotationConfigApplicationContext(DropDriveCmdContext.class)
+                .getBean(IDropDriveCmdRunner.class)
+                .run(args);
     }
 }

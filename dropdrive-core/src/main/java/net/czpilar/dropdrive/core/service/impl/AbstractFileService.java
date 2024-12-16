@@ -33,12 +33,12 @@ public abstract class AbstractFileService extends AbstractService {
 
     protected FolderMetadata findFolder(String filename, FolderMetadata parent) {
         Metadata entry = findEntry(filename, parent);
-        return entry != null && entry instanceof FolderMetadata ? (FolderMetadata) entry : null;
+        return entry instanceof FolderMetadata ? (FolderMetadata) entry : null;
     }
 
     protected FileMetadata findFile(String filename, FolderMetadata parent) {
         Metadata entry = findEntry(filename, parent);
-        return entry != null && entry instanceof FileMetadata ? (FileMetadata) entry : null;
+        return entry instanceof FileMetadata ? (FileMetadata) entry : null;
     }
 
     private Metadata findEntry(String filename, FolderMetadata parent) {

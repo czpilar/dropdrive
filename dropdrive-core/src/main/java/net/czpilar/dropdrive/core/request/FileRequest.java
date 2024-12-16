@@ -2,10 +2,7 @@ package net.czpilar.dropdrive.core.request;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.CommitInfo;
-import com.dropbox.core.v2.files.FileMetadata;
-import com.dropbox.core.v2.files.UploadSessionCursor;
-import com.dropbox.core.v2.files.WriteMode;
+import com.dropbox.core.v2.files.*;
 import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,9 +75,11 @@ public class FileRequest {
                     .withMode(writeMode)
                     .withClientModified(new Date(localFile.lastModified()))
                     .build();
-            FileMetadata file = dbxClient.files().uploadSessionFinish(cursor, commitInfo).finish();
-            progress(IFileUploadProgressListener.State.COMPLETE, offsetBytes);
-            return file;
+            try (UploadSessionFinishUploader uploadSessionFinishUploader = dbxClient.files().uploadSessionFinish(cursor, commitInfo)) {
+                FileMetadata file = uploadSessionFinishUploader.finish();
+                progress(IFileUploadProgressListener.State.COMPLETE, offsetBytes);
+                return file;
+            }
         }
     }
 
@@ -102,10 +101,13 @@ public class FileRequest {
     private String uploadChunk(long offset, InputStream stream, String chunkId, long read) throws DbxException, IOException {
         if (offset == 0) {
             progress(IFileUploadProgressListener.State.IN_PROGRESS, offset);
-            return dbxClient.files().uploadSessionStart()
-                    .uploadAndFinish(stream, read).getSessionId();
+            try (UploadSessionStartUploader uploadSessionStartUploader = dbxClient.files().uploadSessionStart()) {
+                return uploadSessionStartUploader.uploadAndFinish(stream, read).getSessionId();
+            }
         } else {
-            dbxClient.files().uploadSessionAppend(chunkId, offset).uploadAndFinish(stream, read);
+            try (UploadSessionAppendV2Uploader uploadSessionAppendUploader = dbxClient.files().uploadSessionAppendV2(new UploadSessionCursor(chunkId, offset))) {
+                uploadSessionAppendUploader.uploadAndFinish(stream, read);
+            }
         }
         return chunkId;
     }
