@@ -1,6 +1,6 @@
 dropDrive
 
-Copyright 2015 David Pilar
+Copyright 2015-2025 David Pilar
 
 Licensed under the Apache License, Version 2.0
 
