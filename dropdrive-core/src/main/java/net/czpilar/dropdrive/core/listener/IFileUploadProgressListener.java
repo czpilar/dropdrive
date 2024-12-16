@@ -8,7 +8,7 @@ package net.czpilar.dropdrive.core.listener;
 public interface IFileUploadProgressListener {
 
     enum State {
-        INITIATION, IN_PROGRESS, COMPLETE;
+        INITIATION, IN_PROGRESS, COMPLETE
     }
 
     /**

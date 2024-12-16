@@ -269,7 +269,7 @@ public class DropDriveCmdRunnerTest {
     @Test
     public void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsAndReturnNullCredential() throws ParseException {
         String propertiesValue = "test-properties-value";
-        String authorizationValue = "test-athorization-value";
+        String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
         Option[] optionList = {mock(Option.class), mock(Option.class)};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
@@ -313,7 +313,7 @@ public class DropDriveCmdRunnerTest {
     @Test
     public void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsAndReturnCredential() throws ParseException {
         String propertiesValue = "test-properties-value";
-        String authorizationValue = "test-athorization-value";
+        String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
         Option[] optionList = {mock(Option.class), mock(Option.class)};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);

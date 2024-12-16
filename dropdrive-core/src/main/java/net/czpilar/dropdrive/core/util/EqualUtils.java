@@ -15,9 +15,9 @@ public class EqualUtils {
     /**
      * Returns true if lengths are equal and remote last modified time is greater or equal to local file, otherwise returns false.
      *
-     * @param file
-     * @param pathToFile
-     * @return
+     * @param file       file
+     * @param pathToFile path to file
+     * @return true if equals
      */
     public static boolean equals(FileMetadata file, Path pathToFile) {
         boolean result = false;
@@ -34,8 +34,8 @@ public class EqualUtils {
     /**
      * This method strips milliseconds and returns seconds.
      *
-     * @param milliseconds
-     * @return
+     * @param milliseconds milliseconds
+     * @return seconds
      */
     private static long toSeconds(long milliseconds) {
         return milliseconds / 1000;
@@ -44,9 +44,9 @@ public class EqualUtils {
     /**
      * Returns true if lengths are not equal or remote last modified time is lower than local file, otherwise returns false.
      *
-     * @param file
-     * @param pathToFile
-     * @return
+     * @param file       file
+     * @param pathToFile path to file
+     * @return true if equals
      */
     public static boolean notEquals(FileMetadata file, Path pathToFile) {
         return !equals(file, pathToFile);

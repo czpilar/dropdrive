@@ -105,7 +105,7 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
         }
     }
 
-    private void doAuthrizationOption(CommandLine cmd) {
+    private void doAuthorizationOption(CommandLine cmd) {
         if (cmd.hasOption(OPTION_AUTHORIZATION)) {
             Credential credential = authorizationService.authorize(cmd.getOptionValue(OPTION_AUTHORIZATION));
             if (credential != null) {
@@ -152,7 +152,7 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
             doVersionOption(cmd);
             doHelpOption(cmd);
             doLinkOption(cmd);
-            doAuthrizationOption(cmd);
+            doAuthorizationOption(cmd);
             doFileOption(cmd);
         } catch (CommandLineException e) {
             System.out.println(e.getMessage() + "\n");

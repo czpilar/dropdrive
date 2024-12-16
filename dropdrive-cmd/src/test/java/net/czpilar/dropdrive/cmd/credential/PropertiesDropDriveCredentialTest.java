@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +23,6 @@ public class PropertiesDropDriveCredentialTest {
 
     private File propertiesNotExist;
     private File propertiesExist;
-    private Properties properties;
 
     @BeforeEach
     public void before() throws IOException {
@@ -32,17 +32,19 @@ public class PropertiesDropDriveCredentialTest {
         deleteIfExist(propertiesNotExist);
         deleteIfExist(propertiesExist);
 
-        properties = new Properties();
+        Properties properties = new Properties();
         properties.setProperty(DropDriveCmdContext.UPLOAD_DIR_PROPERTY_KEY, "test-upload-dir");
         properties.setProperty(DropDriveCmdContext.ACCESS_TOKEN_PROPERTY_KEY, "test-access-token");
-        properties.store(new FileOutputStream(propertiesExist), "properties created in test");
+        try (FileOutputStream out = new FileOutputStream(propertiesExist)) {
+            properties.store(out, "properties created in test");
+        }
 
         dropDrivePropertiesNotExist = createDropDriveCredential(propertiesNotExist.getPath());
         dropDrivePropertiesExist = createDropDriveCredential(propertiesExist.getPath());
     }
 
     @AfterEach
-    public void after() {
+    public void after() throws IOException {
         deleteIfExist(propertiesNotExist);
         deleteIfExist(propertiesExist);
     }
@@ -54,10 +56,8 @@ public class PropertiesDropDriveCredentialTest {
         return dropDriveCredential;
     }
 
-    private void deleteIfExist(File file) {
-        if (file.exists()) {
-            file.delete();
-        }
+    private void deleteIfExist(File file) throws IOException {
+        Files.deleteIfExists(file.toPath());
     }
 
     @Test

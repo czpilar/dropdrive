@@ -59,7 +59,7 @@ public class AuthorizationServiceTest {
         String authorizationCode = "test-authorization-code";
         String accessToken = "test-access-token";
 
-        DbxAuthFinish dbxAuthFinish = new DbxAuthFinish(accessToken, "user-id", "url-state", "team-id", "url-state");
+        DbxAuthFinish dbxAuthFinish = new DbxAuthFinish(accessToken, null, null, "user-id", "url-state", "team-id", "url-state");
 
         when(dbxWebAuth.finishFromCode(authorizationCode)).thenReturn(dbxAuthFinish);
 

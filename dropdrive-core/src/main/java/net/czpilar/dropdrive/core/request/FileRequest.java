@@ -41,11 +41,11 @@ public class FileRequest {
 
     private IFileUploadProgressListener progressListener;
 
-    private FileRequest(DbxClientV2 dbxClient, String remoteFilePath, File localFile, WriteMode witeMode) {
+    private FileRequest(DbxClientV2 dbxClient, String remoteFilePath, File localFile, WriteMode writeMode) {
         this.dbxClient = dbxClient;
         this.remoteFilePath = remoteFilePath;
         this.localFile = localFile;
-        this.writeMode = witeMode;
+        this.writeMode = writeMode;
     }
 
     public void setProgressListener(IFileUploadProgressListener progressListener) {

@@ -66,6 +66,6 @@ public class DropDriveIntegrationTest {
     public void testUploadFileToSubdirectory() throws IOException {
         String filename = "target/test1.txt";
         createFileIfNotExist(filename);
-        DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup/dropdrive-subdir/dropdrive-lastdir", "-p", PROPERTIES});
+        DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup/dropdrive-subdir/dropdrive-last-dir", "-p", PROPERTIES});
     }
 }

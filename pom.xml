@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.czpilar.dropdrive</groupId>
@@ -13,7 +13,7 @@
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -23,7 +23,7 @@
             <id>czpilar</id>
             <name>David Pilar</name>
             <email>david@czpilar.net</email>
-            <url>http://czpilar.net</url>
+            <url>https://czpilar.net</url>
             <roles>
                 <role>designer</role>
                 <role>developer</role>
@@ -31,7 +31,7 @@
             </roles>
             <timezone>+2</timezone>
             <organization>czpilar.net</organization>
-            <organizationUrl>http://czpilar.net</organizationUrl>
+            <organizationUrl>https://czpilar.net</organizationUrl>
         </developer>
     </developers>
 

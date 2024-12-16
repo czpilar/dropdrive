@@ -54,7 +54,9 @@ public class PropertiesDropDriveCredential extends AbstractDropDriveCredential {
 
     private void saveProperties() {
         try {
-            getProperties().store(new FileOutputStream(propertyFile), "dropdrive properties file");
+            try (FileOutputStream out = new FileOutputStream(propertyFile)) {
+                getProperties().store(out, "dropdrive properties file");
+            }
         } catch (IOException e) {
             throw new PropertiesFileException("Cannot save properties file.", e);
         }
@@ -62,7 +64,9 @@ public class PropertiesDropDriveCredential extends AbstractDropDriveCredential {
 
     private void loadProperties() {
         try {
-            getProperties().load(new FileInputStream(propertyFile));
+            try (FileInputStream in = new FileInputStream(propertyFile)) {
+                getProperties().load(in);
+            }
         } catch (IOException e) {
             throw new PropertiesFileException("Cannot load properties file.", e);
         }
