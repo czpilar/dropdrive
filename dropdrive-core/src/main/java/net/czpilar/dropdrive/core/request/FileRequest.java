@@ -3,6 +3,7 @@ package net.czpilar.dropdrive.core.request;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.*;
+import net.czpilar.dropdrive.core.exception.DropDriveException;
 import net.czpilar.dropdrive.core.listener.IFileUploadProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class FileRequest {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileRequest.class);
 
-    public static final int CHUNK_SIZE = 4194304; // 4MB // TODO make chunk size configurable
+    public static final int CHUNK_SIZE = 4194304; // 4MB
     public static final int CHUNK_RETRIES = 5;
 
     public static FileRequest createInsert(DbxClientV2 dbxClient, String remoteFilePath, File localFile) {
@@ -68,6 +69,10 @@ public class FileRequest {
                 chunkId = uploadChunkWithRetries(offsetBytes, stream, chunkId, readBytes);
                 offsetBytes += readBytes;
                 progress(IFileUploadProgressListener.State.IN_PROGRESS, offsetBytes);
+            }
+
+            if (chunkId == null) {
+                throw new DropDriveException("No chunk found");
             }
 
             UploadSessionCursor cursor = new UploadSessionCursor(chunkId, offsetBytes);

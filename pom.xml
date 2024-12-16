@@ -59,7 +59,7 @@
         <version.commons-codec>1.17.1</version.commons-codec>
         <version.commons-io>2.18.0</version.commons-io>
         <version.commons-lang3>3.17.0</version.commons-lang3>
-        <version.dropbox.sdk>5.0.0</version.dropbox.sdk>
+        <version.dropbox.sdk>7.0.0</version.dropbox.sdk>
         <version.logback>1.5.12</version.logback>
         <version.mockito>5.14.2</version.mockito>
         <version.slf4j>2.0.16</version.slf4j>

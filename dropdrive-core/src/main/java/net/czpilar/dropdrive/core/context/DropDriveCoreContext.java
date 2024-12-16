@@ -6,7 +6,6 @@ import com.dropbox.core.DbxWebAuth;
 import com.dropbox.core.v2.DbxClientV2;
 import net.czpilar.dropdrive.core.credential.loader.CredentialLoader;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 
 @Configuration
@@ -16,16 +15,12 @@ public class DropDriveCoreContext {
 
     private final DbxRequestConfig dbxRequestConfig;
     private final DbxAppInfo dbxAppInfo;
-    private CredentialLoader credentialLoader;
+    private final CredentialLoader credentialLoader;
 
-    @Autowired
-    public void setCredentialLoader(CredentialLoader credentialLoader) {
-        this.credentialLoader = credentialLoader;
-    }
-
-    public DropDriveCoreContext(DropDriveSetting dropDriveSetting) {
+    public DropDriveCoreContext(DropDriveSetting dropDriveSetting, CredentialLoader credentialLoader) {
         dbxRequestConfig = new DbxRequestConfig(dropDriveSetting.getApplicationName());
         dbxAppInfo = new DbxAppInfo(dropDriveSetting.getClientKey(), dropDriveSetting.getClientSecret());
+        this.credentialLoader = credentialLoader;
     }
 
     @Bean
