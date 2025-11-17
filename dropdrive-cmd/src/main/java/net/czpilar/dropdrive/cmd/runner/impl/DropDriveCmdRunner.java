@@ -8,10 +8,15 @@ import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.service.IAuthorizationService;
 import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -141,7 +146,11 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
     }
 
     private void printCommandLine() {
-        helpFormatter.printHelp(dropDriveSetting.getApplicationName(), options, true);
+        try {
+            helpFormatter.printHelp(dropDriveSetting.getApplicationName(), null, options, null, true);
+        } catch (IOException e) {
+            throw new CommandLineException("Unable to print help!", e);
+        }
     }
 
     @Override

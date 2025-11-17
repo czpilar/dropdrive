@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.text.NumberFormat;
 
 /**
- * Listener used for printing progress of uploading file.
+ * Listener used for printing progress of uploading a file.
  *
  * @author David Pilar (david@czpilar.net)
  */

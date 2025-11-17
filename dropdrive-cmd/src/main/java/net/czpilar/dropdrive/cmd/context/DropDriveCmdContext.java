@@ -3,9 +3,9 @@ package net.czpilar.dropdrive.cmd.context;
 import net.czpilar.dropdrive.cmd.credential.PropertiesDropDriveCredential;
 import net.czpilar.dropdrive.core.context.DropDriveCoreContext;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.springframework.context.annotation.*;
 
 import static net.czpilar.dropdrive.cmd.runner.impl.DropDriveCmdRunner.*;
@@ -27,7 +27,7 @@ public class DropDriveCmdContext {
 
     @Bean
     public HelpFormatter helpFormatter() {
-        return new HelpFormatter();
+        return HelpFormatter.builder().setShowSince(false).get();
     }
 
     @Bean
