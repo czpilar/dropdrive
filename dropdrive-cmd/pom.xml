@@ -9,7 +9,6 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dropdrive-cmd</artifactId>
     <packaging>jar</packaging>
-    <version>1.4.1-SNAPSHOT</version>
     <name>dropdrive-cmd</name>
     <description>Simple java command line application for uploading file(s) to Dropbox.</description>
 
