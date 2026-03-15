@@ -3,6 +3,7 @@ package net.czpilar.dropdrive.core.service.impl;
 import com.dropbox.core.v2.DbxClientV2;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Template service.
@@ -18,6 +19,7 @@ public abstract class AbstractService {
         return dbxClient;
     }
 
+    @Lazy
     @Autowired
     public void setDbxClient(DbxClientV2 dbxClient) {
         this.dbxClient = dbxClient;
