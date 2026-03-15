@@ -3,6 +3,7 @@ package net.czpilar.dropdrive.core.context;
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuth;
+import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxClientV2;
 import net.czpilar.dropdrive.core.credential.loader.CredentialLoader;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
@@ -24,9 +25,12 @@ public class DropDriveCoreContext {
     }
 
     @Bean
-    @Scope("prototype")
+    @Lazy
     public DbxClientV2 dbxClient() {
-        return new DbxClientV2(dbxRequestConfig, credentialLoader.getCredential().accessToken());
+        DbxCredential credential = new DbxCredential("", 0L,
+                credentialLoader.getRefreshToken(),
+                dbxAppInfo.getKey(), dbxAppInfo.getSecret());
+        return new DbxClientV2(dbxRequestConfig, credential);
     }
 
     @Bean

@@ -1,6 +1,5 @@
 package net.czpilar.dropdrive.core.credential.loader;
 
-import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import net.czpilar.dropdrive.core.exception.NoCredentialFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ public class CredentialLoader {
         this.dropDriveCredential = dropDriveCredential;
     }
 
-    public Credential getCredential() {
-        return dropDriveCredential.getCredential();
+    public String getRefreshToken() {
+        return dropDriveCredential.getRefreshToken();
     }
 }

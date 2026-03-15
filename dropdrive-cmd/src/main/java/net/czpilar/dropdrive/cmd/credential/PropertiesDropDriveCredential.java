@@ -18,15 +18,15 @@ import java.util.Properties;
 public class PropertiesDropDriveCredential extends AbstractDropDriveCredential {
 
     private final String uploadDirPropertyKey;
-    private final String accessTokenPropertyKey;
+    private final String refreshTokenPropertyKey;
     private final String defaultUploadDir;
 
     private String propertyFile;
     private Properties properties;
 
-    public PropertiesDropDriveCredential(String uploadDirPropertyKey, String accessTokenPropertyKey, String defaultUploadDir) {
+    public PropertiesDropDriveCredential(String uploadDirPropertyKey, String refreshTokenPropertyKey, String defaultUploadDir) {
         this.uploadDirPropertyKey = uploadDirPropertyKey;
-        this.accessTokenPropertyKey = accessTokenPropertyKey;
+        this.refreshTokenPropertyKey = refreshTokenPropertyKey;
         this.defaultUploadDir = defaultUploadDir;
     }
 
@@ -73,17 +73,15 @@ public class PropertiesDropDriveCredential extends AbstractDropDriveCredential {
     }
 
     @Override
-    public String getAccessToken() {
-        return getProperties().getProperty(accessTokenPropertyKey);
-    }
-
-    public void setAccessToken(String accessToken) {
-        getProperties().setProperty(accessTokenPropertyKey, accessToken);
+    public String getRefreshToken() {
+        return getProperties().getProperty(refreshTokenPropertyKey);
     }
 
     @Override
-    public void saveTokens(String accessToken) {
-        setAccessToken(accessToken);
+    public void saveRefreshToken(String refreshToken) {
+        if (refreshToken != null) {
+            getProperties().setProperty(refreshTokenPropertyKey, refreshToken);
+        }
         saveProperties();
     }
 

@@ -2,7 +2,7 @@ package net.czpilar.dropdrive.core.service.impl;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxWebAuth;
-import net.czpilar.dropdrive.core.credential.Credential;
+import com.dropbox.core.TokenAccessType;
 import net.czpilar.dropdrive.core.exception.AuthorizationFailedException;
 import net.czpilar.dropdrive.core.service.IAuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +25,17 @@ public class AuthorizationService extends AbstractService implements IAuthorizat
 
     @Override
     public String getAuthorizationURL() {
-        return dbxWebAuth.authorize(DbxWebAuth.newRequestBuilder().withNoRedirect().build());
+        return dbxWebAuth.authorize(DbxWebAuth.newRequestBuilder()
+                .withNoRedirect()
+                .withTokenAccessType(TokenAccessType.OFFLINE)
+                .build());
     }
 
     @Override
-    public Credential authorize(String authorizationCode) {
+    public void authorize(String authorizationCode) {
         try {
-            Credential credential = new Credential(dbxWebAuth.finishFromCode(authorizationCode).getAccessToken());
-            getDropDriveCredential().saveCredential(credential);
-            return credential;
+            String refreshToken = dbxWebAuth.finishFromCode(authorizationCode).getRefreshToken();
+            getDropDriveCredential().saveRefreshToken(refreshToken);
         } catch (DbxException e) {
             throw new AuthorizationFailedException("Error occurs during authorization process.", e);
         }

@@ -19,24 +19,19 @@ public class SimpleDropDriveCredentialTest {
     }
 
     @Test
-    public void testSetAndGetAccessToken() {
-        assertNull(credential.getAccessToken());
-
-        String accessToken = "test-access-token";
-        credential.setAccessToken(accessToken);
-
-        assertEquals(accessToken, credential.getAccessToken());
+    public void testGetRefreshToken() {
+        assertNull(credential.getRefreshToken());
     }
 
     @Test
-    public void testSaveTokens() {
-        assertNull(credential.getAccessToken());
+    public void testSaveRefreshToken() {
+        assertNull(credential.getRefreshToken());
 
-        String accessToken = "test-access-token";
+        String refreshToken = "test-refresh-token";
 
-        credential.saveTokens(accessToken);
+        credential.saveRefreshToken(refreshToken);
 
-        assertEquals(accessToken, credential.getAccessToken());
+        assertEquals(refreshToken, credential.getRefreshToken());
     }
 
     @Test

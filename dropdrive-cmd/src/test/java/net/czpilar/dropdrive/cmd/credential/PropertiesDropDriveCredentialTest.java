@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author David Pilar (david@czpilar.net)
@@ -34,7 +35,7 @@ public class PropertiesDropDriveCredentialTest {
 
         Properties properties = new Properties();
         properties.setProperty(DropDriveCmdContext.UPLOAD_DIR_PROPERTY_KEY, "test-upload-dir");
-        properties.setProperty(DropDriveCmdContext.ACCESS_TOKEN_PROPERTY_KEY, "test-access-token");
+        properties.setProperty(DropDriveCmdContext.REFRESH_TOKEN_PROPERTY_KEY, "test-refresh-token");
         try (FileOutputStream out = new FileOutputStream(propertiesExist)) {
             properties.store(out, "properties created in test");
         }
@@ -51,7 +52,7 @@ public class PropertiesDropDriveCredentialTest {
 
     private PropertiesDropDriveCredential createDropDriveCredential(String propertyFile) {
         PropertiesDropDriveCredential dropDriveCredential = new PropertiesDropDriveCredential(
-                DropDriveCmdContext.UPLOAD_DIR_PROPERTY_KEY, DropDriveCmdContext.ACCESS_TOKEN_PROPERTY_KEY, DropDriveCmdContext.DEFAULT_UPLOAD_DIR);
+                DropDriveCmdContext.UPLOAD_DIR_PROPERTY_KEY, DropDriveCmdContext.REFRESH_TOKEN_PROPERTY_KEY, DropDriveCmdContext.DEFAULT_UPLOAD_DIR);
         dropDriveCredential.setPropertyFile(propertyFile);
         return dropDriveCredential;
     }
@@ -61,23 +62,31 @@ public class PropertiesDropDriveCredentialTest {
     }
 
     @Test
-    public void testGetAccessTokenWherePropertiesExist() {
-        assertEquals("test-access-token", dropDrivePropertiesExist.getAccessToken());
+    public void testGetRefreshTokenWherePropertiesExist() {
+        assertEquals("test-refresh-token", dropDrivePropertiesExist.getRefreshToken());
     }
 
     @Test
-    public void testSetAccessToken() {
-        dropDrivePropertiesNotExist.setAccessToken("new-access-token");
-        assertEquals("new-access-token", dropDrivePropertiesNotExist.getAccessToken());
+    public void testGetRefreshTokenWherePropertiesNotExist() {
+        assertNull(dropDrivePropertiesNotExist.getRefreshToken());
     }
 
     @Test
-    public void testSaveTokens() {
-        dropDrivePropertiesNotExist.saveTokens("new-access-token-to-save");
+    public void testSaveRefreshToken() {
+        dropDrivePropertiesNotExist.saveRefreshToken("new-refresh-token-to-save");
 
         PropertiesDropDriveCredential dropDrivePropertiesInTest = createDropDriveCredential(propertiesNotExist.getPath());
 
-        assertEquals("new-access-token-to-save", dropDrivePropertiesInTest.getAccessToken());
+        assertEquals("new-refresh-token-to-save", dropDrivePropertiesInTest.getRefreshToken());
+    }
+
+    @Test
+    public void testSaveRefreshTokenWithNull() {
+        dropDrivePropertiesNotExist.saveRefreshToken(null);
+
+        PropertiesDropDriveCredential dropDrivePropertiesInTest = createDropDriveCredential(propertiesNotExist.getPath());
+
+        assertNull(dropDrivePropertiesInTest.getRefreshToken());
     }
 
     @Test

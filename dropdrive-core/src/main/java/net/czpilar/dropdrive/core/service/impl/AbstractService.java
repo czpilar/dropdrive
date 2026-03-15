@@ -3,7 +3,6 @@ package net.czpilar.dropdrive.core.service.impl;
 import com.dropbox.core.v2.DbxClientV2;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Template service.
@@ -12,12 +11,16 @@ import org.springframework.context.ApplicationContext;
  */
 public abstract class AbstractService {
 
-    private ApplicationContext applicationContext;
+    private DbxClientV2 dbxClient;
     private IDropDriveCredential dropDriveCredential;
 
+    protected DbxClientV2 getDbxClient() {
+        return dbxClient;
+    }
+
     @Autowired
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public void setDbxClient(DbxClientV2 dbxClient) {
+        this.dbxClient = dbxClient;
     }
 
     public IDropDriveCredential getDropDriveCredential() {
@@ -27,10 +30,6 @@ public abstract class AbstractService {
     @Autowired
     public void setDropDriveCredential(IDropDriveCredential dropDriveCredential) {
         this.dropDriveCredential = dropDriveCredential;
-    }
-
-    protected DbxClientV2 getDbxClient() {
-        return applicationContext.getBean(DbxClientV2.class);
     }
 
 }

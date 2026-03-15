@@ -38,7 +38,7 @@ If you want to change upload directory:
    `dropdrive -p dropdrive.properties -f <file> -d <path>/<to>/<dir>`
 
 ### How to use properties file
-- `dropdrive.accessToken` - Dropbox access token; this property is updated automatically by dropDrive
+- `dropdrive.refreshToken` - Dropbox refresh token; this property is updated automatically by dropDrive
 - `dropdrive.uploadDir` - path to dir where files will be uploaded: `<path>/<to>/<dir>`
 
 dropDrive as core library
@@ -56,7 +56,7 @@ dropDrive core can be used in any other application to provide ability for uploa
 License
 =======
 
-    Copyright 2015-2025 David Pilar
+    Copyright 2015-2026 David Pilar
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

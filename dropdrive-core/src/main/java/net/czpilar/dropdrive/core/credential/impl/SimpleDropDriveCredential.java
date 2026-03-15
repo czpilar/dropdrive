@@ -8,21 +8,17 @@ package net.czpilar.dropdrive.core.credential.impl;
  */
 public class SimpleDropDriveCredential extends AbstractDropDriveCredential {
 
-    private String accessToken;
+    private String refreshToken;
     private String uploadDir;
 
     @Override
-    protected String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
     @Override
-    protected void saveTokens(String accessToken) {
-        setAccessToken(accessToken);
+    public void saveRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     @Override

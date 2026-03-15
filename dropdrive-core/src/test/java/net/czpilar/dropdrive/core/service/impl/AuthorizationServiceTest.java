@@ -3,7 +3,6 @@ package net.czpilar.dropdrive.core.service.impl;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxWebAuth;
-import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.credential.IDropDriveCredential;
 import net.czpilar.dropdrive.core.exception.AuthorizationFailedException;
 import org.junit.jupiter.api.AfterEach;
@@ -57,19 +56,16 @@ public class AuthorizationServiceTest {
     @Test
     public void testAuthorize() throws DbxException {
         String authorizationCode = "test-authorization-code";
-        String accessToken = "test-access-token";
+        String refreshToken = "test-refresh-token";
 
-        DbxAuthFinish dbxAuthFinish = new DbxAuthFinish(accessToken, null, null, "user-id", "url-state", "team-id", "url-state");
+        DbxAuthFinish dbxAuthFinish = new DbxAuthFinish("test-access-token", null, refreshToken, "user-id", "team-id", "account-id", "url-state");
 
         when(dbxWebAuth.finishFromCode(authorizationCode)).thenReturn(dbxAuthFinish);
 
-        Credential result = service.authorize(authorizationCode);
-
-        assertNotNull(result);
-        assertEquals(accessToken, result.accessToken());
+        service.authorize(authorizationCode);
 
         verify(dbxWebAuth).finishFromCode(authorizationCode);
-        verify(credential).saveCredential(result);
+        verify(credential).saveRefreshToken(refreshToken);
 
         verifyNoMoreInteractions(dbxWebAuth);
         verifyNoMoreInteractions(credential);

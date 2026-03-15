@@ -17,12 +17,12 @@ import static net.czpilar.dropdrive.cmd.runner.impl.DropDriveCmdRunner.*;
 public class DropDriveCmdContext {
 
     public static final String UPLOAD_DIR_PROPERTY_KEY = "dropdrive.uploadDir";
-    public static final String ACCESS_TOKEN_PROPERTY_KEY = "dropdrive.accessToken";
+    public static final String REFRESH_TOKEN_PROPERTY_KEY = "dropdrive.refreshToken";
     public static final String DEFAULT_UPLOAD_DIR = "dropdrive-uploads";
 
     @Bean
     public PropertiesDropDriveCredential propertiesDropDriveCredential() {
-        return new PropertiesDropDriveCredential(UPLOAD_DIR_PROPERTY_KEY, ACCESS_TOKEN_PROPERTY_KEY, DEFAULT_UPLOAD_DIR);
+        return new PropertiesDropDriveCredential(UPLOAD_DIR_PROPERTY_KEY, REFRESH_TOKEN_PROPERTY_KEY, DEFAULT_UPLOAD_DIR);
     }
 
     @Bean

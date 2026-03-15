@@ -20,8 +20,6 @@ import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.springframework.context.ApplicationContext;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -46,9 +44,6 @@ public class FileServiceTest {
     private IDirectoryService directoryService;
 
     @Mock
-    private ApplicationContext applicationContext;
-
-    @Mock
     private DbxClientV2 dbxClient;
 
     @Mock
@@ -64,12 +59,11 @@ public class FileServiceTest {
     @BeforeEach
     public void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        service.setApplicationContext(applicationContext);
+        service.setDbxClient(dbxClient);
         service.setDropDriveCredential(dropDriveCredential);
         service.setDirectoryService(directoryService);
 
         when(serviceMock.getDirectoryService()).thenReturn(directoryService);
-        when(applicationContext.getBean(DbxClientV2.class)).thenReturn(dbxClient);
 
         dbxClientV2MockedStatic = mockStatic(DbxClientV2.class);
         dbxUserFilesRequestsMockedStatic = mockStatic(DbxUserFilesRequests.class);

@@ -1,10 +1,12 @@
 package net.czpilar.dropdrive.cmd;
 
+import net.czpilar.dropdrive.core.request.FileRequest;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 
 /**
@@ -51,6 +53,15 @@ public class DropDriveIntegrationTest {
         }
     }
 
+    private void createLargeFileIfNotExist(String filename, long size) throws IOException {
+        File file = new File(filename);
+        if (!file.exists()) {
+            try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+                raf.setLength(size);
+            }
+        }
+    }
+
     @Test
     public void testUploadFiles() throws IOException {
         String filename1 = "target/test1.txt";
@@ -67,5 +78,28 @@ public class DropDriveIntegrationTest {
         String filename = "target/test1.txt";
         createFileIfNotExist(filename);
         DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup/dropdrive-subdir/dropdrive-last-dir", "-p", PROPERTIES});
+    }
+
+    @Test
+    public void testUploadLargeFile() throws IOException {
+        String filename = "target/test-large-file.bin";
+        createLargeFileIfNotExist(filename, FileRequest.CHUNK_SIZE + 1);
+        DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup", "-p", PROPERTIES});
+    }
+
+    @Test
+    public void testUploadLargeFileMultipleChunks() throws IOException {
+        String filename = "target/test-large-file-multi-chunk.bin";
+        createLargeFileIfNotExist(filename, FileRequest.CHUNK_SIZE * 3L + 1);
+        DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup", "-p", PROPERTIES});
+    }
+
+    @Test
+    public void testUploadSmallAndLargeFiles() throws IOException {
+        String smallFilename = "target/test-small.txt";
+        String largeFilename = "target/test-large-file-mixed.bin";
+        createFileIfNotExist(smallFilename);
+        createLargeFileIfNotExist(largeFilename, FileRequest.CHUNK_SIZE + 1);
+        DropDrive.main(new String[]{"-f", smallFilename, largeFilename, "-d", "dropdrive-test-backup", "-p", PROPERTIES});
     }
 }

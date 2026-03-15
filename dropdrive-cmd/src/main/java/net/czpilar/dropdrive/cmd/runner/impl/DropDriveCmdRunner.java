@@ -4,7 +4,6 @@ import com.dropbox.core.v2.files.FileMetadata;
 import net.czpilar.dropdrive.cmd.credential.PropertiesDropDriveCredential;
 import net.czpilar.dropdrive.cmd.exception.CommandLineException;
 import net.czpilar.dropdrive.cmd.runner.IDropDriveCmdRunner;
-import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.service.IAuthorizationService;
 import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
@@ -112,10 +111,8 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
 
     private void doAuthorizationOption(CommandLine cmd) {
         if (cmd.hasOption(OPTION_AUTHORIZATION)) {
-            Credential credential = authorizationService.authorize(cmd.getOptionValue(OPTION_AUTHORIZATION));
-            if (credential != null) {
-                System.out.println("Authorization was successful.");
-            }
+            authorizationService.authorize(cmd.getOptionValue(OPTION_AUTHORIZATION));
+            System.out.println("Authorization was successful.");
         }
     }
 

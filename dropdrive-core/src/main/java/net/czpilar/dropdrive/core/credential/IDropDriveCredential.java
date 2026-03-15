@@ -8,18 +8,18 @@ package net.czpilar.dropdrive.core.credential;
 public interface IDropDriveCredential {
 
     /**
-     * Returns credential.
+     * Returns refresh token.
      *
-     * @return credential
+     * @return refresh token
      */
-    Credential getCredential();
+    String getRefreshToken();
 
     /**
-     * Saves credential.
+     * Saves refresh token.
      *
-     * @param credential credential
+     * @param refreshToken refresh token
      */
-    void saveCredential(Credential credential);
+    void saveRefreshToken(String refreshToken);
 
     /**
      * Returns upload dir.

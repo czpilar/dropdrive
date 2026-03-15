@@ -1,7 +1,5 @@
 package net.czpilar.dropdrive.core.service;
 
-import net.czpilar.dropdrive.core.credential.Credential;
-
 /**
  * Authorization service interface.
  *
@@ -17,11 +15,10 @@ public interface IAuthorizationService {
     String getAuthorizationURL();
 
     /**
-     * Authorize application and returns credential.
+     * Authorize application.
      *
      * @param authorizationCode authorization code
-     * @return credential
      */
-    Credential authorize(String authorizationCode);
+    void authorize(String authorizationCode);
 
 }

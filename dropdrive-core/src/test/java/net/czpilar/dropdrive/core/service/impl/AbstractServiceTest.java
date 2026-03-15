@@ -7,10 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.context.ApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * @author David Pilar (david@czpilar.net)
@@ -23,9 +21,6 @@ public class AbstractServiceTest {
     private IDropDriveCredential dropDriveCredential;
 
     @Mock
-    private ApplicationContext applicationContext;
-
-    @Mock
     private DbxClientV2 dbxClient;
 
     private AutoCloseable autoCloseable;
@@ -35,9 +30,7 @@ public class AbstractServiceTest {
         autoCloseable = MockitoAnnotations.openMocks(this);
         service = new AbstractService() {
         };
-        service.setApplicationContext(applicationContext);
-
-        when(applicationContext.getBean(DbxClientV2.class)).thenReturn(dbxClient);
+        service.setDbxClient(dbxClient);
     }
 
     @AfterEach
@@ -60,9 +53,5 @@ public class AbstractServiceTest {
 
         assertNotNull(result);
         assertEquals(dbxClient, result);
-
-        verify(applicationContext).getBean(DbxClientV2.class);
-
-        verifyNoMoreInteractions(applicationContext);
     }
 }
