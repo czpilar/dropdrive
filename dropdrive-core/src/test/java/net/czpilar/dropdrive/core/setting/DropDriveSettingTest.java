@@ -14,9 +14,10 @@ public class DropDriveSettingTest {
         String applicationVersion = "test-application-version";
         String clientKey = "test-client-key";
         String clientSecret = "test-client-secret";
+        String redirectUri = "http://127.0.0.1:9999/test-context";
         int redirectUriPort = 9999;
         String redirectUriContext = "/test-context";
-        DropDriveSetting setting = new DropDriveSetting(applicationVersion, clientKey, clientSecret, redirectUriPort, redirectUriContext);
+        DropDriveSetting setting = new DropDriveSetting(applicationVersion, clientKey, clientSecret, redirectUri, redirectUriPort, redirectUriContext);
 
         assertEquals(DropDriveSetting.APPLICATION_NAME, setting.getApplicationName());
         assertEquals(applicationVersion, setting.getApplicationVersion());
@@ -24,6 +25,6 @@ public class DropDriveSettingTest {
         assertEquals(clientSecret, setting.getClientSecret());
         assertEquals(redirectUriPort, setting.getRedirectUriPort());
         assertEquals(redirectUriContext, setting.getRedirectUriContext());
-        assertEquals("http://127.0.0.1:9999/test-context", setting.getRedirectUri());
+        assertEquals(redirectUri, setting.getRedirectUri());
     }
 }

@@ -16,17 +16,20 @@ public class DropDriveSetting {
     private final String applicationVersion;
     private final String clientKey;
     private final String clientSecret;
+    private final String redirectUri;
     private final int redirectUriPort;
     private final String redirectUriContext;
 
     public DropDriveSetting(@Value("${dropdrive.version}") String applicationVersion,
                             @Value("${dropdrive.core.drive.clientKey}") String clientKey,
                             @Value("${dropdrive.core.drive.clientSecret}") String clientSecret,
-                            @Value("${dropdrive.core.drive.redirectUri.port:8784}") int redirectUriPort,
-                            @Value("${dropdrive.core.drive.redirectUri.context:/dropdrive}") String redirectUriContext) {
+                            @Value("${dropdrive.core.drive.redirectUri}") String redirectUri,
+                            @Value("${dropdrive.core.drive.redirectUri.port}") int redirectUriPort,
+                            @Value("${dropdrive.core.drive.redirectUri.context}") String redirectUriContext) {
         this.applicationVersion = applicationVersion;
         this.clientKey = clientKey;
         this.clientSecret = clientSecret;
+        this.redirectUri = redirectUri;
         this.redirectUriPort = redirectUriPort;
         this.redirectUriContext = redirectUriContext;
     }
@@ -56,6 +59,6 @@ public class DropDriveSetting {
     }
 
     public String getRedirectUri() {
-        return "http://127.0.0.1:" + redirectUriPort + redirectUriContext;
+        return redirectUri;
     }
 }
