@@ -8,22 +8,29 @@ dropDrive as command line application
 -------------------------------------
 
 ### Usage
-usage: `dropdrive [-a <code>] [-d <dir>] [-f <file>] [-h] [-l] [-p <props>] [-v]`
+usage: `dropdrive [-a [code]] [-d <dir>] [-f <file>] [-h] [-l] [-p <props>] [-v]`
 
- `-a <code>` - process authorization<br/>
+ `-a [code]` - process authorization; waits for code if not provided<br/>
  `-d <dir>` - directory for upload; creates new one if no directory exists; default is dropdrive-uploads<br/>
- `-f <file>` - upload files<br/>
+ `-f <file>` - upload file(s)<br/>
  `-h` - show this help<br/>
  `-l` - display authorization link<br/>
  `-p <props>` - path to dropDrive properties file<br/>
- `-v` -show dropDrive version
+ `-v` - show dropDrive version
 
-### How to authorize application
+### How to authorize application manually
 1. generate authorization URL:<br/>
    `dropdrive -p dropdrive.properties -l`
 2. copy and paste URL to your browser to receive authorization code
 3. authorize application with received authorization code:<br/>
    `dropdrive -p dropdrive.properties -a <code>`
+
+### How to authorize application automatically
+1. generate authorization URL and wait for authorization code:<br/>
+   `dropdrive -p dropdrive.properties -l -a`
+2. copy and paste URL to your browser to receive authorization code
+3. application waits 5 minutes to receive authorization code
+4. application is authorized automatically with received authorization code
 
 ### How to upload files
 Upload file(s) to Dropbox:<br/>

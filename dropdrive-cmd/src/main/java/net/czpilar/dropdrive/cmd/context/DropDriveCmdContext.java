@@ -41,7 +41,7 @@ public class DropDriveCmdContext {
                 .addOption(toOption(OPTION_VERSION, "show dropDrive version"))
                 .addOption(toOption(OPTION_HELP, "show this help"))
                 .addOption(toOption(OPTION_LINK, "display authorization link"))
-                .addOption(toOption(OPTION_AUTHORIZATION, "process authorization", "code"))
+                .addOption(toOptionalOption(OPTION_AUTHORIZATION, "process authorization; waits for code if not provided", "code"))
                 .addOption(toUnlimitedOption(toOption(OPTION_FILE, "upload file(s)", "file")))
                 .addOption(toOption(OPTION_DIRECTORY, "directory for upload; creates new one if no directory exists; default is dropdrive-uploads", "dir"))
                 .addOption(toOption(OPTION_PROPERTIES, "path to dropDrive properties file", "props"));
@@ -54,6 +54,13 @@ public class DropDriveCmdContext {
     private Option toOption(String opt, String description, String argName) {
         Option option = new Option(opt, true, description);
         option.setArgName(argName);
+        return option;
+    }
+
+    private Option toOptionalOption(String opt, String description, String argName) {
+        Option option = new Option(opt, true, description);
+        option.setArgName(argName);
+        option.setOptionalArg(true);
         return option;
     }
 

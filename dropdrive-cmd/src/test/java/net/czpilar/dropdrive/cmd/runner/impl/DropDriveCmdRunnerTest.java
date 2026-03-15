@@ -2,6 +2,7 @@ package net.czpilar.dropdrive.cmd.runner.impl;
 
 import com.dropbox.core.v2.files.FileMetadata;
 import net.czpilar.dropdrive.cmd.credential.PropertiesDropDriveCredential;
+import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.service.IAuthorizationService;
 import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
@@ -16,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
@@ -41,6 +43,8 @@ public class DropDriveCmdRunnerTest {
     private PropertiesDropDriveCredential propertiesDropDriveCredential;
     @Mock
     private CommandLine commandLine;
+    @Mock
+    private AuthorizationCodeWaiter codeWaiter;
 
     private AutoCloseable autoCloseable;
 
@@ -54,6 +58,7 @@ public class DropDriveCmdRunnerTest {
         runner.setFileService(fileService);
         runner.setDropDriveSetting(dropDriveSetting);
         runner.setPropertiesDropDriveCredential(propertiesDropDriveCredential);
+        runner.setCodeWaiter(codeWaiter);
     }
 
     @AfterEach
@@ -83,6 +88,7 @@ public class DropDriveCmdRunnerTest {
         verifyNoInteractions(fileService);
         verifyNoInteractions(propertiesDropDriveCredential);
         verifyNoInteractions(commandLine);
+        verifyNoInteractions(codeWaiter);
     }
 
     @Test
@@ -110,13 +116,14 @@ public class DropDriveCmdRunnerTest {
         verifyNoInteractions(authorizationService);
         verifyNoInteractions(fileService);
         verifyNoInteractions(propertiesDropDriveCredential);
+        verifyNoInteractions(codeWaiter);
     }
 
     @Test
     public void testRunWhereCommandLineHasOnlyPropertiesOption() throws ParseException, IOException {
         String appName = "application-name";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -139,6 +146,7 @@ public class DropDriveCmdRunnerTest {
         verifyNoInteractions(authorizationService);
         verifyNoInteractions(fileService);
         verifyNoInteractions(propertiesDropDriveCredential);
+        verifyNoInteractions(codeWaiter);
     }
 
     @Test
@@ -146,7 +154,7 @@ public class DropDriveCmdRunnerTest {
         String appVersion = "application-version";
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("v").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -181,6 +189,7 @@ public class DropDriveCmdRunnerTest {
         verifyNoInteractions(options);
         verifyNoInteractions(authorizationService);
         verifyNoInteractions(fileService);
+        verifyNoInteractions(codeWaiter);
     }
 
     @Test
@@ -188,7 +197,7 @@ public class DropDriveCmdRunnerTest {
         String appName = "application-name";
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("h").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -224,13 +233,14 @@ public class DropDriveCmdRunnerTest {
         verifyNoInteractions(options);
         verifyNoInteractions(authorizationService);
         verifyNoInteractions(fileService);
+        verifyNoInteractions(codeWaiter);
     }
 
     @Test
     public void testRunWhereCommandLineHasPropertiesAndLinkOptions() throws ParseException {
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("l").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -265,6 +275,7 @@ public class DropDriveCmdRunnerTest {
 
         verifyNoInteractions(options);
         verifyNoInteractions(fileService);
+        verifyNoInteractions(codeWaiter);
     }
 
     @Test
@@ -272,7 +283,7 @@ public class DropDriveCmdRunnerTest {
         String propertiesValue = "test-properties-value";
         String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("a").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -283,6 +294,7 @@ public class DropDriveCmdRunnerTest {
         when(commandLine.hasOption(DropDriveCmdRunner.OPTION_FILE)).thenReturn(false);
         when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(propertiesValue);
         when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(authorizationValue);
+        when(authorizationService.authorize(authorizationValue)).thenReturn(new Credential("token", "refresh"));
 
         runner.run(args);
 
@@ -308,6 +320,54 @@ public class DropDriveCmdRunnerTest {
 
         verifyNoInteractions(options);
         verifyNoInteractions(fileService);
+        verifyNoInteractions(codeWaiter);
+    }
+
+    @Test
+    public void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsNoValueAndCodeWaiterReturnsCode() throws ParseException {
+        String propertiesValue = "test-properties-value";
+        String authorizationValue = "test-authorization-value";
+        String[] args = {"arg1", "arg2"};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("a").build()};
+        when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
+        when(commandLine.getOptions()).thenReturn(optionList);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_VERSION)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_HELP)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_LINK)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(true);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_FILE)).thenReturn(false);
+        when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(propertiesValue);
+        when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(null);
+        when(authorizationService.authorize(authorizationValue)).thenReturn(new Credential("token", "refresh"));
+        when(codeWaiter.getCode()).thenReturn(Optional.of(authorizationValue));
+
+        runner.run(args);
+
+        verify(commandLineParser).parse(options, args);
+        verify(commandLine).getOptions();
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_PROPERTIES);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_VERSION);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_HELP);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_LINK);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_AUTHORIZATION);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_FILE);
+        verify(commandLine).getOptionValue(DropDriveCmdRunner.OPTION_PROPERTIES);
+        verify(commandLine).getOptionValue(DropDriveCmdRunner.OPTION_AUTHORIZATION);
+        verify(propertiesDropDriveCredential).setPropertyFile(propertiesValue);
+        verify(authorizationService).authorize(authorizationValue);
+        verify(codeWaiter).getCode();
+
+        verifyNoMoreInteractions(commandLineParser);
+        verifyNoMoreInteractions(helpFormatter);
+        verifyNoMoreInteractions(dropDriveSetting);
+        verifyNoMoreInteractions(commandLine);
+        verifyNoMoreInteractions(propertiesDropDriveCredential);
+        verifyNoMoreInteractions(codeWaiter);
+        verifyNoMoreInteractions(authorizationService);
+
+        verifyNoInteractions(options);
+        verifyNoInteractions(fileService);
     }
 
     @Test
@@ -316,7 +376,7 @@ public class DropDriveCmdRunnerTest {
         String optionFile = "test-file-value";
         List<String> optionFiles = List.of(optionFile);
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("f").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -354,7 +414,7 @@ public class DropDriveCmdRunnerTest {
 
         verifyNoInteractions(options);
         verifyNoInteractions(authorizationService);
-        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(codeWaiter);
     }
 
     @Test
@@ -364,7 +424,7 @@ public class DropDriveCmdRunnerTest {
         String optionDirectory = "test-directory";
         List<String> optionFiles = List.of(optionFile);
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("f").build()};
         FileMetadata file1 = mock(FileMetadata.class);
         FileMetadata file2 = mock(FileMetadata.class);
         List<FileMetadata> files = Arrays.asList(file1, file2);
@@ -413,7 +473,7 @@ public class DropDriveCmdRunnerTest {
 
         verifyNoInteractions(options);
         verifyNoInteractions(authorizationService);
-        verifyNoInteractions(authorizationService);
+        verifyNoInteractions(codeWaiter);
     }
 
 }

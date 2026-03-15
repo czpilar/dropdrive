@@ -4,6 +4,7 @@ import com.dropbox.core.v2.files.FileMetadata;
 import net.czpilar.dropdrive.cmd.credential.PropertiesDropDriveCredential;
 import net.czpilar.dropdrive.cmd.exception.CommandLineException;
 import net.czpilar.dropdrive.cmd.runner.IDropDriveCmdRunner;
+import net.czpilar.dropdrive.core.credential.Credential;
 import net.czpilar.dropdrive.core.service.IAuthorizationService;
 import net.czpilar.dropdrive.core.service.IFileService;
 import net.czpilar.dropdrive.core.setting.DropDriveSetting;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Command line runner implementation.
@@ -48,6 +50,13 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
     private DropDriveSetting dropDriveSetting;
 
     private PropertiesDropDriveCredential propertiesDropDriveCredential;
+
+    private AuthorizationCodeWaiter codeWaiter;
+
+    @Autowired
+    public void setCodeWaiter(AuthorizationCodeWaiter codeWaiter) {
+        this.codeWaiter = codeWaiter;
+    }
 
     @Autowired
     public void setCommandLineParser(CommandLineParser commandLineParser) {
@@ -111,8 +120,16 @@ public class DropDriveCmdRunner implements IDropDriveCmdRunner {
 
     private void doAuthorizationOption(CommandLine cmd) {
         if (cmd.hasOption(OPTION_AUTHORIZATION)) {
-            authorizationService.authorize(cmd.getOptionValue(OPTION_AUTHORIZATION));
-            System.out.println("Authorization was successful.");
+            Optional<String> optionValue = Optional.ofNullable(cmd.getOptionValue(OPTION_AUTHORIZATION));
+            if (optionValue.isEmpty()) {
+                optionValue = codeWaiter.getCode();
+            }
+            optionValue.ifPresent(code -> {
+                Credential credential = authorizationService.authorize(code);
+                if (credential != null) {
+                    System.out.println("Authorization was successful.");
+                }
+            });
         }
     }
 

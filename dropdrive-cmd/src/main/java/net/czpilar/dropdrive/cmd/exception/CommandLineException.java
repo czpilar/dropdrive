@@ -13,6 +13,10 @@ public class CommandLineException extends DropDriveException {
         super(message);
     }
 
+    public CommandLineException(Throwable cause) {
+        super(cause.getMessage(), cause);
+    }
+
     public CommandLineException(String message, Throwable cause) {
         super(message, cause);
     }
