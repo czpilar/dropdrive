@@ -279,7 +279,52 @@ class DropDriveCmdRunnerTest {
     }
 
     @Test
-    void testRunWhereCommandLineHasPropertiesAndAuthorizationOptions() throws ParseException {
+    void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsAndReturnNullCredential() throws ParseException {
+        String propertiesValue = "test-properties-value";
+        String authorizationValue = "test-authorization-value";
+        String[] args = {"arg1", "arg2"};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("a").build()};
+        when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
+        when(commandLine.getOptions()).thenReturn(optionList);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_VERSION)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_HELP)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_LINK)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(true);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_FILE)).thenReturn(false);
+        when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(propertiesValue);
+        when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(authorizationValue);
+        when(authorizationService.authorize(authorizationValue)).thenReturn(null);
+
+        runner.run(args);
+
+        verify(commandLineParser).parse(options, args);
+        verify(commandLine).getOptions();
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_PROPERTIES);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_VERSION);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_HELP);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_LINK);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_AUTHORIZATION);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_FILE);
+        verify(commandLine).getOptionValue(DropDriveCmdRunner.OPTION_PROPERTIES);
+        verify(commandLine).getOptionValue(DropDriveCmdRunner.OPTION_AUTHORIZATION);
+        verify(propertiesDropDriveCredential).setPropertyFile(propertiesValue);
+        verify(authorizationService).authorize(authorizationValue);
+
+        verifyNoMoreInteractions(commandLineParser);
+        verifyNoMoreInteractions(helpFormatter);
+        verifyNoMoreInteractions(dropDriveSetting);
+        verifyNoMoreInteractions(commandLine);
+        verifyNoMoreInteractions(propertiesDropDriveCredential);
+        verifyNoMoreInteractions(authorizationService);
+
+        verifyNoInteractions(options);
+        verifyNoInteractions(fileService);
+        verifyNoInteractions(codeWaiter);
+    }
+
+    @Test
+    void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsAndReturnCredential() throws ParseException {
         String propertiesValue = "test-properties-value";
         String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
@@ -367,6 +412,50 @@ class DropDriveCmdRunnerTest {
         verifyNoMoreInteractions(authorizationService);
 
         verifyNoInteractions(options);
+        verifyNoInteractions(fileService);
+    }
+
+    @Test
+    void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsNoValueAndCodeWaiterReturnsEmpty() throws ParseException {
+        String propertiesValue = "test-properties-value";
+        String[] args = {"arg1", "arg2"};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("a").build()};
+        when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
+        when(commandLine.getOptions()).thenReturn(optionList);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_VERSION)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_HELP)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_LINK)).thenReturn(false);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(true);
+        when(commandLine.hasOption(DropDriveCmdRunner.OPTION_FILE)).thenReturn(false);
+        when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_PROPERTIES)).thenReturn(propertiesValue);
+        when(commandLine.getOptionValue(DropDriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(null);
+        when(codeWaiter.getCode()).thenReturn(Optional.empty());
+
+        runner.run(args);
+
+        verify(commandLineParser).parse(options, args);
+        verify(commandLine).getOptions();
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_PROPERTIES);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_VERSION);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_HELP);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_LINK);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_AUTHORIZATION);
+        verify(commandLine).hasOption(DropDriveCmdRunner.OPTION_FILE);
+        verify(commandLine).getOptionValue(DropDriveCmdRunner.OPTION_PROPERTIES);
+        verify(commandLine).getOptionValue(DropDriveCmdRunner.OPTION_AUTHORIZATION);
+        verify(propertiesDropDriveCredential).setPropertyFile(propertiesValue);
+        verify(codeWaiter).getCode();
+
+        verifyNoMoreInteractions(commandLineParser);
+        verifyNoMoreInteractions(helpFormatter);
+        verifyNoMoreInteractions(dropDriveSetting);
+        verifyNoMoreInteractions(commandLine);
+        verifyNoMoreInteractions(propertiesDropDriveCredential);
+        verifyNoMoreInteractions(codeWaiter);
+
+        verifyNoInteractions(options);
+        verifyNoInteractions(authorizationService);
         verifyNoInteractions(fileService);
     }
 
