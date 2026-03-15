@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-public class AuthorizationServiceTest {
+class AuthorizationServiceTest {
 
     private final AuthorizationService service = new AuthorizationService();
 
@@ -36,7 +36,7 @@ public class AuthorizationServiceTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         service.setDbxWebAuth(dbxWebAuth);
         service.setDropDriveCredential(credential);
@@ -45,12 +45,12 @@ public class AuthorizationServiceTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testGetAuthorizationURL() {
+    void testGetAuthorizationURL() {
         when(dbxWebAuth.authorize(any())).thenReturn("authorization-request-url");
 
         String result = service.getAuthorizationURL();
@@ -64,7 +64,7 @@ public class AuthorizationServiceTest {
     }
 
     @Test
-    public void testAuthorize() throws Exception {
+    void testAuthorize() throws Exception {
         String authorizationCode = "test-authorization-code";
         String accessToken = "test-access-token";
         String refreshToken = "test-refresh-token";
@@ -88,7 +88,7 @@ public class AuthorizationServiceTest {
     }
 
     @Test
-    public void testAuthorizeWithExceptionDuringStoringCredential() throws Exception {
+    void testAuthorizeWithExceptionDuringStoringCredential() throws Exception {
         String authorizationCode = "test-authorization-code";
 
         when(dbxWebAuth.finishFromRedirect(anyString(), any(DbxSessionStore.class), any(Map.class))).thenThrow(DbxException.class);

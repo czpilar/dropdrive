@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-public class AbstractDropDriveCredentialTest {
+class AbstractDropDriveCredentialTest {
 
     @Test
-    public void testCreateInstance() {
+    void testCreateInstance() {
         AbstractDropDriveCredential credential = new AbstractDropDriveCredential() {
             @Override
             public String getRefreshToken() {

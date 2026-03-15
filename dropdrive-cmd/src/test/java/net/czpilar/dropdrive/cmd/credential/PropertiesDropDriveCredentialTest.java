@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-public class PropertiesDropDriveCredentialTest {
+class PropertiesDropDriveCredentialTest {
 
     private PropertiesDropDriveCredential dropDrivePropertiesNotExist;
     private PropertiesDropDriveCredential dropDrivePropertiesExist;
@@ -26,7 +26,7 @@ public class PropertiesDropDriveCredentialTest {
     private File propertiesExist;
 
     @BeforeEach
-    public void before() throws IOException {
+    void before() throws IOException {
         String tempDir = System.getProperty("java.io.tmpdir");
         propertiesNotExist = new File(tempDir + "test-properties-not-exist-file-" + System.currentTimeMillis() + ".properties");
         propertiesExist = new File(tempDir + "test-properties-exist-file-" + System.currentTimeMillis() + ".properties");
@@ -45,7 +45,7 @@ public class PropertiesDropDriveCredentialTest {
     }
 
     @AfterEach
-    public void after() throws IOException {
+    void after() throws IOException {
         deleteIfExist(propertiesNotExist);
         deleteIfExist(propertiesExist);
     }
@@ -62,17 +62,17 @@ public class PropertiesDropDriveCredentialTest {
     }
 
     @Test
-    public void testGetRefreshTokenWherePropertiesExist() {
+    void testGetRefreshTokenWherePropertiesExist() {
         assertEquals("test-refresh-token", dropDrivePropertiesExist.getRefreshToken());
     }
 
     @Test
-    public void testGetRefreshTokenWherePropertiesNotExist() {
+    void testGetRefreshTokenWherePropertiesNotExist() {
         assertNull(dropDrivePropertiesNotExist.getRefreshToken());
     }
 
     @Test
-    public void testSaveRefreshToken() {
+    void testSaveRefreshToken() {
         dropDrivePropertiesNotExist.saveRefreshToken("new-refresh-token-to-save");
 
         PropertiesDropDriveCredential dropDrivePropertiesInTest = createDropDriveCredential(propertiesNotExist.getPath());
@@ -81,7 +81,7 @@ public class PropertiesDropDriveCredentialTest {
     }
 
     @Test
-    public void testSaveRefreshTokenWithNull() {
+    void testSaveRefreshTokenWithNull() {
         dropDrivePropertiesNotExist.saveRefreshToken(null);
 
         PropertiesDropDriveCredential dropDrivePropertiesInTest = createDropDriveCredential(propertiesNotExist.getPath());
@@ -90,17 +90,17 @@ public class PropertiesDropDriveCredentialTest {
     }
 
     @Test
-    public void testGetUploadDirWherePropertiesNotExist() {
+    void testGetUploadDirWherePropertiesNotExist() {
         assertEquals(DropDriveCmdContext.DEFAULT_UPLOAD_DIR, dropDrivePropertiesNotExist.getUploadDir());
     }
 
     @Test
-    public void testGetUploadDirWherePropertiesExist() {
+    void testGetUploadDirWherePropertiesExist() {
         assertEquals("test-upload-dir", dropDrivePropertiesExist.getUploadDir());
     }
 
     @Test
-    public void testSetUploadDir() {
+    void testSetUploadDir() {
         dropDrivePropertiesNotExist.setUploadDir("new-upload-dir");
         assertEquals("new-upload-dir", dropDrivePropertiesNotExist.getUploadDir());
     }

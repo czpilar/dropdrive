@@ -11,9 +11,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @Import(DropDriveCmdContext.class)
-public class ApplicationContextTest {
+class ApplicationContextTest {
 
     @Test
-    public void test() {
+    void test() {
     }
 }

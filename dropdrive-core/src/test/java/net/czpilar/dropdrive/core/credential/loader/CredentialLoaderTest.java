@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-public class CredentialLoaderTest {
+class CredentialLoaderTest {
 
     private CredentialLoader loader;
 
@@ -24,23 +24,23 @@ public class CredentialLoaderTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         loader = new CredentialLoader(dropDriveCredential);
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testConstructorWhereNoCredentialLoaded() {
+    void testConstructorWhereNoCredentialLoaded() {
         assertThrows(NoCredentialFoundException.class, () -> new CredentialLoader(null));
     }
 
     @Test
-    public void testGetRefreshToken() {
+    void testGetRefreshToken() {
         when(dropDriveCredential.getRefreshToken()).thenReturn("test-refresh-token");
 
         String result = loader.getRefreshToken();
@@ -54,7 +54,7 @@ public class CredentialLoaderTest {
     }
 
     @Test
-    public void testGetRefreshTokenReturnsNull() {
+    void testGetRefreshTokenReturnsNull() {
         when(dropDriveCredential.getRefreshToken()).thenReturn(null);
 
         String result = loader.getRefreshToken();

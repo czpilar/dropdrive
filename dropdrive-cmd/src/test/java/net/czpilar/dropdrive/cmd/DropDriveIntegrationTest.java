@@ -12,42 +12,42 @@ import java.nio.charset.Charset;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-public class DropDriveIntegrationTest {
+class DropDriveIntegrationTest {
 
     private static final String PROPERTIES = "dropdrive.properties";
 
     @Test
-    public void testNoArgs() {
+    void testNoArgs() {
         DropDrive.main(new String[]{});
     }
 
     @Test
-    public void testHelp() {
+    void testHelp() {
         DropDrive.main(new String[]{"-h"});
     }
 
     @Test
-    public void testVersion() {
+    void testVersion() {
         DropDrive.main(new String[]{"-v"});
     }
 
     @Test
-    public void testProperties() {
+    void testProperties() {
         DropDrive.main(new String[]{"-p", PROPERTIES});
     }
 
     @Test
-    public void testShowAuthLink() {
+    void testShowAuthLink() {
         DropDrive.main(new String[]{"-l", "-p", PROPERTIES});
     }
 
     @Test
-    public void testAuthorize() {
+    void testAuthorize() {
         DropDrive.main(new String[]{"-a", "auth_code", "-p", PROPERTIES});
     }
 
     @Test
-    public void testShowAuthLinkAndAuthorize() {
+    void testShowAuthLinkAndAuthorize() {
         DropDrive.main(new String[]{"-l", "-a", "-p", PROPERTIES});
     }
 
@@ -68,7 +68,7 @@ public class DropDriveIntegrationTest {
     }
 
     @Test
-    public void testUploadFiles() throws IOException {
+    void testUploadFiles() throws IOException {
         String filename1 = "target/test1.txt";
         String filename2 = "target/test2.txt";
         String filename3 = "target/test3.txt";
@@ -79,28 +79,28 @@ public class DropDriveIntegrationTest {
     }
 
     @Test
-    public void testUploadFileToSubdirectory() throws IOException {
+    void testUploadFileToSubdirectory() throws IOException {
         String filename = "target/test1.txt";
         createFileIfNotExist(filename);
         DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup/dropdrive-subdir/dropdrive-last-dir", "-p", PROPERTIES});
     }
 
     @Test
-    public void testUploadLargeFile() throws IOException {
+    void testUploadLargeFile() throws IOException {
         String filename = "target/test-large-file.bin";
         createLargeFileIfNotExist(filename, FileRequest.CHUNK_SIZE + 1);
         DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup", "-p", PROPERTIES});
     }
 
     @Test
-    public void testUploadLargeFileMultipleChunks() throws IOException {
+    void testUploadLargeFileMultipleChunks() throws IOException {
         String filename = "target/test-large-file-multi-chunk.bin";
         createLargeFileIfNotExist(filename, FileRequest.CHUNK_SIZE * 3L + 1);
         DropDrive.main(new String[]{"-f", filename, "-d", "dropdrive-test-backup", "-p", PROPERTIES});
     }
 
     @Test
-    public void testUploadSmallAndLargeFiles() throws IOException {
+    void testUploadSmallAndLargeFiles() throws IOException {
         String smallFilename = "target/test-small.txt";
         String largeFilename = "target/test-large-file-mixed.bin";
         createFileIfNotExist(smallFilename);

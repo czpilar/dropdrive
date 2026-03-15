@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-public class AbstractServiceTest {
+class AbstractServiceTest {
 
     private AbstractService service;
 
@@ -26,7 +26,7 @@ public class AbstractServiceTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         service = new AbstractService() {
         };
@@ -34,12 +34,12 @@ public class AbstractServiceTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testSetAndGetDropDriveCredential() {
+    void testSetAndGetDropDriveCredential() {
         assertNull(service.getDropDriveCredential());
 
         service.setDropDriveCredential(dropDriveCredential);
@@ -48,7 +48,7 @@ public class AbstractServiceTest {
     }
 
     @Test
-    public void testGetDbxClient() {
+    void testGetDbxClient() {
         DbxClientV2 result = service.getDbxClient();
 
         assertNotNull(result);

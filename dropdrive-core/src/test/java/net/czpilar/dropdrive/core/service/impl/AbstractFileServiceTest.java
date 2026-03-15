@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AbstractFileServiceTest {
+class AbstractFileServiceTest {
 
     @Mock
     private AbstractFileService service;
@@ -30,7 +30,7 @@ public class AbstractFileServiceTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
 
         when(service.getDbxClient()).thenReturn(dbxClient);
@@ -38,12 +38,12 @@ public class AbstractFileServiceTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testGetPathWithNullFilename() {
+    void testGetPathWithNullFilename() {
         Metadata entry = mock(Metadata.class);
 
         when(service.getPath(any(), any())).thenCallRealMethod();
@@ -55,7 +55,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testGetPathWithFilenameAndNullParent() {
+    void testGetPathWithFilenameAndNullParent() {
         when(service.getPath(anyString(), any())).thenCallRealMethod();
 
         String result = service.getPath("filename", null);
@@ -69,7 +69,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testGetPathWithFilenameStartingWithSlashAndNullParent() {
+    void testGetPathWithFilenameStartingWithSlashAndNullParent() {
         when(service.getPath(anyString(), any())).thenCallRealMethod();
 
         String result = service.getPath("/filename", null);
@@ -83,7 +83,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testGetPathWithFilenameAndExistingParent() {
+    void testGetPathWithFilenameAndExistingParent() {
         FolderMetadata parent = new FolderMetadata("icon", "id", "/path/to/parent", "/path/to/parent", null, null, null, null, null);
 
         when(service.getPath(anyString(), any(Metadata.class))).thenCallRealMethod();
@@ -99,7 +99,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFolderWhenEntryIsNull() throws DbxException {
+    void testFindFolderWhenEntryIsNull() throws DbxException {
         FolderMetadata parent = mock(FolderMetadata.class);
 
         when(service.findFolder(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
@@ -121,7 +121,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFolderWhenEntryIsFile() throws DbxException {
+    void testFindFolderWhenEntryIsFile() throws DbxException {
         FolderMetadata parent = mock(FolderMetadata.class);
         FileMetadata entry = mock(FileMetadata.class);
 
@@ -145,7 +145,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFolderWhenEntryIsFolder() throws DbxException {
+    void testFindFolderWhenEntryIsFolder() throws DbxException {
         FolderMetadata parent = mock(FolderMetadata.class);
         FolderMetadata entry = mock(FolderMetadata.class);
 
@@ -170,7 +170,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFolderWhenException() throws DbxException {
+    void testFindFolderWhenException() throws DbxException {
         FolderMetadata parent = mock(FolderMetadata.class);
 
         when(service.findFolder(anyString(), any())).thenCallRealMethod();
@@ -190,7 +190,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFileWhenEntryIsNull() throws DbxException {
+    void testFindFileWhenEntryIsNull() throws DbxException {
         FolderMetadata parent = mock(FolderMetadata.class);
 
         when(service.findFile(anyString(), any())).thenCallRealMethod();
@@ -212,7 +212,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFileWhenEntryIsFolder() throws DbxException {
+    void testFindFileWhenEntryIsFolder() throws DbxException {
         FolderMetadata parent = mock(FolderMetadata.class);
         FolderMetadata entry = mock(FolderMetadata.class);
 
@@ -236,7 +236,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFileWhenEntryIsFile() throws DbxException {
+    void testFindFileWhenEntryIsFile() throws DbxException {
         FolderMetadata parent = mock(FolderMetadata.class);
         FileMetadata entry = mock(FileMetadata.class);
 
@@ -261,7 +261,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFileWhenException() throws DbxException {
+    void testFindFileWhenException() throws DbxException {
         FolderMetadata parent = mock(FolderMetadata.class);
 
         when(service.findFile(anyString(), any())).thenCallRealMethod();

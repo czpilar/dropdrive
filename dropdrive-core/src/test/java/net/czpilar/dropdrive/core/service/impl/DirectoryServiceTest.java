@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-public class DirectoryServiceTest {
+class DirectoryServiceTest {
 
     private final DirectoryService service = new DirectoryService();
 
@@ -34,7 +34,7 @@ public class DirectoryServiceTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
 
         when(serviceMock.getDbxClient()).thenReturn(dbxClient);
@@ -42,17 +42,17 @@ public class DirectoryServiceTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testCreateOneDirectoryWhereDirnameIsNullAndParentDirIsNull() {
+    void testCreateOneDirectoryWhereDirnameIsNullAndParentDirIsNull() {
         assertThrows(IllegalArgumentException.class, () -> service.createOneDirectory(null, null));
     }
 
     @Test
-    public void testCreateOneDirectoryWhereParentDirIsNull() throws DbxException {
+    void testCreateOneDirectoryWhereParentDirIsNull() throws DbxException {
         String dirname = "/test-dirname";
         FolderMetadata directory = mock(FolderMetadata.class);
         CreateFolderResult createFolderResult = mock(CreateFolderResult.class);
@@ -81,7 +81,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testCreateOneDirectoryWhereParentDirExists() throws DbxException {
+    void testCreateOneDirectoryWhereParentDirExists() throws DbxException {
         String dirname = "/test-dirname";
         FolderMetadata parentDir = mock(FolderMetadata.class);
         FolderMetadata directory = mock(FolderMetadata.class);
@@ -111,7 +111,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testCreateOneDirectoryWhereDbxExceptionWasThrown() throws DbxException {
+    void testCreateOneDirectoryWhereDbxExceptionWasThrown() throws DbxException {
         String dirname = "/test-dirname";
         FolderMetadata directory = mock(FolderMetadata.class);
 
@@ -133,7 +133,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateOneDirectoryWhereDirectoryIsFound() {
+    void testFindOrCreateOneDirectoryWhereDirectoryIsFound() {
         FolderMetadata parentDir = mock(FolderMetadata.class);
         FolderMetadata directory = mock(FolderMetadata.class);
         String dirname = "/test-dirname";
@@ -156,7 +156,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateOneDirectoryWhereDirectoryIsCreated() {
+    void testFindOrCreateOneDirectoryWhereDirectoryIsCreated() {
         FolderMetadata parentDir = mock(FolderMetadata.class);
         FolderMetadata directory = mock(FolderMetadata.class);
         String dirname = "/test-dirname";
@@ -181,7 +181,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathname() {
+    void testFindDirectoryWithPathname() {
         String pathname = "/test-pathname";
         FolderMetadata directory = mock(FolderMetadata.class);
 
@@ -200,7 +200,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathnameAndParentWhereDirnameIsNullAndNextPathnameIsNull() {
+    void testFindDirectoryWithPathnameAndParentWhereDirnameIsNullAndNextPathnameIsNull() {
         when(serviceMock.findDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
 
         FolderMetadata result = serviceMock.findDirectory(null, null);
@@ -213,7 +213,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathnameAndParentWherePathnameHasMoreDirsButCurrentDirIsNull() {
+    void testFindDirectoryWithPathnameAndParentWherePathnameHasMoreDirsButCurrentDirIsNull() {
         String dirname1 = "test-dirname1";
         String dirname2 = "test-dirname2";
         String pathname = dirname1 + "/" + dirname2;
@@ -235,7 +235,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
+    void testFindDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
         String pathname = "test-dirname";
         FolderMetadata parentDir = mock(FolderMetadata.class);
         FolderMetadata directory = mock(FolderMetadata.class);
@@ -258,7 +258,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathnameAndParentWherePathnameHasMoreDirs() {
+    void testFindDirectoryWithPathnameAndParentWherePathnameHasMoreDirs() {
         String dirname1 = "test-dirname1";
         String dirname2 = "test-dirname2";
         String dirname3 = "test-dirname3";
@@ -292,7 +292,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateDirectoryWithPathname() {
+    void testFindOrCreateDirectoryWithPathname() {
         String pathname = "test-pathname";
         FolderMetadata directory = mock(FolderMetadata.class);
 
@@ -311,7 +311,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateDirectoryWithPathnameAndParentWhereDirnameIsNullAndNextPathnameIsNull() {
+    void testFindOrCreateDirectoryWithPathnameAndParentWhereDirnameIsNullAndNextPathnameIsNull() {
         when(serviceMock.findOrCreateDirectory(anyString(), any(FolderMetadata.class))).thenCallRealMethod();
 
         FolderMetadata result = serviceMock.findOrCreateDirectory(null, null);
@@ -324,7 +324,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
+    void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
         String pathname = "test-dirname";
         FolderMetadata parentDir = mock(FolderMetadata.class);
         FolderMetadata directory = mock(FolderMetadata.class);
@@ -347,7 +347,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasMoreDirs() {
+    void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasMoreDirs() {
         String dirname1 = "test-dirname1";
         String dirname2 = "test-dirname2";
         String dirname3 = "test-dirname3";

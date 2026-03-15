@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-public class DropDriveSettingTest {
+class DropDriveSettingTest {
 
     @Test
-    public void testDropDriveSetting() {
+    void testDropDriveSetting() {
         String applicationVersion = "test-application-version";
         String clientKey = "test-client-key";
         String clientSecret = "test-client-secret";
