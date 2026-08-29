@@ -57,8 +57,12 @@ dropDrive core can be used in any other application to provide ability for uploa
    or use `SimpleDropDriveCredential` or extend `AbstractDropDriveCredential`
 2. provide client key as `dropdrive.core.drive.clientKey` property in spring context
 3. provide client secret as `dropdrive.core.drive.clientSecret` property in spring context
-4. import dropDrive spring context with annotation `@Import(net.czpilar.dropdrive.core.context.DropDriveCoreContext.class)`
-5. autowire `IFileService` and use file uploading methods
+4. provide redirect URI as `dropdrive.core.drive.redirectUri` property in spring context
+5. provide redirect URI port as `dropdrive.core.drive.redirectUri.port` property in spring context
+6. provide redirect URI context path as `dropdrive.core.drive.redirectUri.context` property in spring context
+7. provide application version as `dropdrive.version` property in spring context
+8. import dropDrive spring context with annotation `@Import(net.czpilar.dropdrive.core.context.DropDriveCoreContext.class)`
+9. autowire `IFileService` and use file uploading methods
 
 License
 =======
